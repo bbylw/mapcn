@@ -1,0 +1,141 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Arcs 弧线" description="在坐标对之间绘制弯曲连接弧线，支持自定义曲率和交互。">
+  <h1>Arcs 弧线</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    使用二次贝塞尔曲线在经纬度坐标对之间渲染弯曲弧线。支持点击和悬停交互。
+  </p>
+
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapArc</code> 基于 MapLibre
+    <a href="https://maplibre.org/maplibre-style-spec/layers/#line" target="_blank" rel="noopener noreferrer">线图层</a> 构建——
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">paint</code> 和
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">layout</code> 属性接受
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">LineLayerSpecification</code> 的任何字段。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <CodeBlock code={`import { Map, MapArc } from "@/components/ui/map";
+
+const arcs = [
+  {
+    id: "arc-1",
+    from: [-74.006, 40.7128], // 纽约
+    to: [-87.6298, 41.8781],  // 芝加哥
+  },
+  {
+    id: "arc-2",
+    from: [-74.006, 40.7128], // 纽约
+    to: [-118.2437, 34.0522], // 洛杉矶
+  },
+];
+
+export function MapWithArcs() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map blank center={[-95, 40]} zoom={3.5}>
+        <MapArc data={arcs} />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MapWithArcs.tsx" />
+
+  <h2 id="curvature">控制曲率</h2>
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">curvature</code> 控制弧线偏离直线的程度：
+    0 渲染为直线，正值弯曲更多，负值向相反方向弯曲。
+  </p>
+  <CodeBlock code={`<MapArc data={arcs} curvature={0.4} />
+<MapArc data={arcs} curvature={0} /> {/* 直线 */}
+<MapArc data={arcs} curvature={-0.3} /> {/* 反向弯曲 */}`} lang="tsx" />
+
+  <h2 id="custom-paint">自定义样式</h2>
+  <p>通过 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">paint</code> 和 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">layout</code> 自定义线条样式：</p>
+  <CodeBlock code={`<MapArc
+  data={arcs}
+  paint={{
+    "line-color": "#22d3ee",
+    "line-width": 3,
+    "line-opacity": 0.7,
+    "line-blur": 2,
+  }}
+  layout={{
+    "line-join": "round",
+    "line-cap": "round",
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="data-driven">数据驱动样式</h2>
+  <p>使用 MapLibre 表达式实现每条弧线的独立样式：</p>
+  <CodeBlock code={`const arcs = [
+  { id: "1", from: [...], to: [...], color: "#22d3ee", volume: 100 },
+  { id: "2", from: [...], to: [...], color: "#f59e0b", volume: 200 },
+];
+
+<MapArc
+  data={arcs}
+  paint={{
+    "line-color": ["get", "color"],
+    "line-width": ["*", ["get", "volume"], 0.02],
+    "line-opacity": 0.8,
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="hover">悬停高亮</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">hoverPaint</code> 高亮悬停的弧线：</p>
+  <CodeBlock code={`<MapArc
+  data={arcs}
+  paint={{
+    "line-color": "#4285F4",
+    "line-width": 2,
+    "line-opacity": 0.6,
+  }}
+  hoverPaint={{
+    "line-color": "#22d3ee",
+    "line-width": 4,
+    "line-opacity": 1,
+  }}
+  onHover={(e) => {
+    if (e) console.log("悬停弧线:", e.id);
+  }}
+  onClick={(e) => {
+    console.log("点击弧线:", e.id);
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="props">属性</h2>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>data</code></td><td><code>MapArcDatum[]</code></td><td>—</td><td>弧线数据数组。每条需要唯一 id 和 from/to 坐标</td></tr>
+        <tr><td><code>id</code></td><td><code>string</code></td><td>自动生成</td><td>源/图层 id 前缀</td></tr>
+        <tr><td><code>curvature</code></td><td><code>number</code></td><td><code>0.2</code></td><td>弧线弯曲程度。0 为直线</td></tr>
+        <tr><td><code>samples</code></td><td><code>number</code></td><td><code>64</code></td><td>每条弧线的采样点数。越高越平滑</td></tr>
+        <tr><td><code>paint</code></td><td><code>LineLayerSpecification['paint']</code></td><td>默认蓝线</td><td>合并到默认值的绘制属性。支持 MapLibre 表达式</td></tr>
+        <tr><td><code>layout</code></td><td><code>LineLayerSpecification['layout']</code></td><td>默认圆角</td><td>合并到默认值的布局属性</td></tr>
+        <tr><td><code>hoverPaint</code></td><td><code>LineLayerSpecification['paint']</code></td><td>—</td><td>悬停时通过 feature-state 应用的绘制覆盖</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`(e: MapArcEvent) => void`}</code></td><td>—</td><td>弧线点击事件</td></tr>
+        <tr><td><code>onHover</code></td><td><code>{`(e: MapArcEvent | null) => void`}</code></td><td>—</td><td>悬停弧线变化事件</td></tr>
+        <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>true</code></td><td>响应鼠标事件</td></tr>
+        <tr><td><code>beforeId</code></td><td><code>string</code></td><td>—</td><td>在此图层 id 之前插入弧线图层</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">GeoJSON</p>
+    </div>
+    <a href="/docs/geojson" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapGeoJSON 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

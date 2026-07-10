@@ -1,0 +1,85 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="快速开始" description="mapcn 是免费开源的 React 地图组件库，基于 MapLibre GL 构建，与 shadcn/ui 无缝协作。">
+  <h1>快速开始</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    为 React 设计的复制粘贴式地图组件。
+  </p>
+
+  <p>
+    <strong>mapcn</strong> 提供了精美设计、可访问且可定制的地图组件。基于
+    <a href="https://maplibre.org/" target="_blank" rel="noopener noreferrer">MapLibre GL</a> 构建，
+    使用 <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer">Tailwind CSS</a> 样式，
+    并专为与 <a href="https://ui.shadcn.com/" target="_blank" rel="noopener noreferrer">shadcn/ui</a> 协作而设计。
+  </p>
+
+  <h2 id="philosophy">设计哲学</h2>
+  <p>
+    mapcn 遵循 shadcn 的地图模式：复制粘贴你拥有的组件，零锁定，合理的默认值开箱即用。
+  </p>
+  <p>
+    地图通常被视为隐藏在包装库和配置繁重的 SDK 后面的黑盒。mapcn 采取不同的方法——
+    它贴近 MapLibre，保持 API 熟悉感，并让你在需要更多控制时直接访问原始地图实例。
+  </p>
+  <p>
+    目标很简单：让地图感觉像你的 UI 技术栈的其余部分——可组合、可主题化、可访问，
+    并且易于使用 Tailwind 和 shadcn 模式进行自定义。
+  </p>
+
+  <h2 id="why-mapcn">为什么选择 mapcn？</h2>
+  <p>大多数 React 地图方案要么过于臃肿，要么限制太多。mapcn 为希望快速交付且不放弃控制力的团队而生：</p>
+  <ul>
+    <li><strong>拥有你的代码</strong> — 将组件复制到项目中，完全自定义一切。</li>
+    <li><strong>快速启动</strong> — 运行一条命令，使用生产就绪的默认值渲染你的第一张地图。</li>
+    <li><strong>安全扩展</strong> — 直接基于 MapLibre 构建，需要时可下沉到原始 API。</li>
+    <li><strong>设计系统友好</strong> — 使用 Tailwind 样式，自然融入 shadcn/ui 模式。</li>
+  </ul>
+
+  <h2 id="any-map-style">兼容任意地图样式</h2>
+  <p>
+    mapcn 支持所有 <a href="https://maplibre.org/maplibre-style-spec/" target="_blank" rel="noopener noreferrer">MapLibre 兼容的瓦片</a>，
+    这意味着你可以使用几乎任何提供商的瓦片：
+  </p>
+  <ul>
+    <li><a href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> — 社区驱动的开源地图数据</li>
+    <li><a href="https://carto.com/basemaps" target="_blank" rel="noopener noreferrer">CARTO</a> — 简洁的底图，适合数据可视化</li>
+    <li><a href="https://www.maptiler.com/" target="_blank" rel="noopener noreferrer">MapTiler</a> — 精美的矢量瓦片，支持广泛自定义</li>
+    <li><a href="https://stadiamaps.com/" target="_blank" rel="noopener noreferrer">Stadia Maps</a> — 快速可靠的瓦片托管，多种风格</li>
+    <li><a href="https://www.thunderforest.com/" target="_blank" rel="noopener noreferrer">Thunderforest</a> — 专为户外、骑行和交通设计的地图</li>
+    <li>以及任何支持 MapLibre 样式规范的提供商</li>
+  </ul>
+
+  <h2 id="features">核心特性</h2>
+
+  <h3>零配置</h3>
+  <p>使用免费地图瓦片开箱即用，无需 API 密钥。</p>
+
+  <h3>主题感知</h3>
+  <p>自动在浅色和深色地图样式之间切换。</p>
+
+  <h3>可组合</h3>
+  <p>使用简单、可组合的组件构建复杂 UI。</p>
+
+  <h3>TypeScript</h3>
+  <p>全面的 TypeScript 支持提供完整的类型安全。</p>
+
+  <h3>复制粘贴</h3>
+  <p>拥有你的代码。没有依赖，只需复制到项目中。</p>
+
+  <h3>任意地图样式</h3>
+  <p>使用任何 MapLibre 兼容的瓦片：MapTiler、CARTO、OpenStreetMap 等。</p>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">安装指南</p>
+    </div>
+    <a href="/docs/installation" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      开始安装
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

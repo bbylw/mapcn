@@ -1,0 +1,193 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Markers 标记" description="地图标记组件，支持标签、提示和弹窗组合。">
+  <h1>Markers 标记</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    丰富的标记系统，支持弹窗、提示和标签。使用声明式组件构建复杂的标记 UI。
+  </p>
+
+  <h2 id="default-marker">默认标记</h2>
+  <p>最简单的标记——一个蓝色圆点：</p>
+  <CodeBlock code={`import { Map, MapMarker, MarkerContent } from "@/components/ui/map";
+
+export function MapWithMarker() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        <MapMarker longitude={-74.006} latitude={40.7128}>
+          <MarkerContent />
+        </MapMarker>
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MapWithMarker.tsx" />
+
+  <h2 id="custom-marker">自定义标记</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MarkerContent</code> 的 children 自定义标记外观：</p>
+  <CodeBlock code={`<MapMarker longitude={-74.006} latitude={40.7128}>
+  <MarkerContent className="bg-blue-500 text-white rounded-full p-2">
+    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+    </svg>
+  </MarkerContent>
+</MapMarker>`} lang="tsx" />
+
+  <h2 id="marker-label">标记标签</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MarkerLabel</code> 在标记上方或下方显示文字标签：</p>
+  <CodeBlock code={`<MapMarker longitude={-74.006} latitude={40.7128}>
+  <MarkerContent>
+    <MarkerLabel position="top">纽约市</MarkerLabel>
+  </MarkerContent>
+</MapMarker>`} lang="tsx" />
+
+  <h2 id="marker-popup">标记弹窗</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MarkerPopup</code> 附加点击弹窗：</p>
+  <CodeBlock code={`<MapMarker longitude={-74.006} latitude={40.7128}>
+  <MarkerContent />
+  <MarkerPopup closeButton>
+    <div className="p-2">
+      <h3 className="font-semibold">纽约市</h3>
+      <p className="text-sm text-muted-foreground">美国人口最多的城市</p>
+    </div>
+  </MarkerPopup>
+</MapMarker>`} lang="tsx" />
+
+  <h2 id="marker-tooltip">标记提示</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MarkerTooltip</code> 添加悬停提示：</p>
+  <CodeBlock code={`<MapMarker longitude={-74.006} latitude={40.7128}>
+  <MarkerContent />
+  <MarkerTooltip>点击查看详情</MarkerTooltip>
+</MapMarker>`} lang="tsx" />
+
+  <h2 id="draggable">可拖拽标记</h2>
+  <p>MapMarker 继承了 MapLibre GL 的 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MarkerOptions/" target="_blank" rel="noopener noreferrer">MarkerOptions</a>，支持拖拽：</p>
+  <CodeBlock code={`import { Map, MapMarker, MarkerContent } from "@/components/ui/map";
+import { useState } from "react";
+
+export function DraggableMarker() {
+  const [pos, setPos] = useState({
+    longitude: -74.006,
+    latitude: 40.7128,
+  });
+
+  return (
+    <>
+      <div className="h-[320px] overflow-hidden rounded-lg">
+        <Map center={[pos.longitude, pos.latitude]} zoom={11}>
+          <MapMarker
+            longitude={pos.longitude}
+            latitude={pos.latitude}
+            draggable
+            onDragEnd={(lngLat) => setPos({
+              longitude: lngLat.lng,
+              latitude: lngLat.lat,
+            })}
+          >
+            <MarkerContent />
+          </MapMarker>
+        </Map>
+      </div>
+      <p className="mt-2 text-sm">
+        位置：{pos.latitude.toFixed(4)}, {pos.longitude.toFixed(4)}
+      </p>
+    </>
+  );
+}`} lang="tsx" title="DraggableMarker.tsx" />
+
+  <h2 id="anatomy">组件结构</h2>
+  <CodeBlock code={`<MapMarker longitude={...} latitude={...}>
+  <MarkerContent>          {/* 标记视觉内容 */}
+    <MarkerLabel />        {/* 文字标签 */}
+  </MarkerContent>
+  <MarkerPopup>            {/* 点击弹窗 */}
+    弹窗内容
+  </MarkerPopup>
+  <MarkerTooltip>          {/* 悬停提示 */}
+    提示文字
+  </MarkerTooltip>
+</MapMarker>`} lang="tsx" />
+
+  <h2 id="props">属性</h2>
+
+  <h3>MapMarker</h3>
+  <p>继承了 MapLibre GL 的 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MarkerOptions/" target="_blank" rel="noopener noreferrer">MarkerOptions</a>（排除 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">element</code>）。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr><th>属性</th><th>类型</th><th>描述</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>longitude</code></td><td><code>number</code></td><td>标记经度</td></tr>
+        <tr><td><code>latitude</code></td><td><code>number</code></td><td>标记纬度</td></tr>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>标记子组件</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`(e: MouseEvent) => void`}</code></td><td>点击回调</td></tr>
+        <tr><td><code>onMouseEnter</code></td><td><code>{`(e: MouseEvent) => void`}</code></td><td>鼠标进入回调</td></tr>
+        <tr><td><code>onMouseLeave</code></td><td><code>{`(e: MouseEvent) => void`}</code></td><td>鼠标离开回调</td></tr>
+        <tr><td><code>onDragStart</code></td><td><code>{`(lngLat: {lng, lat}) => void`}</code></td><td>拖拽开始回调</td></tr>
+        <tr><td><code>onDrag</code></td><td><code>{`(lngLat: {lng, lat}) => void`}</code></td><td>拖拽中回调</td></tr>
+        <tr><td><code>onDragEnd</code></td><td><code>{`(lngLat: {lng, lat}) => void`}</code></td><td>拖拽结束回调</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>MarkerContent</h3>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>自定义标记内容，默认为蓝色圆点</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>标记容器的额外 CSS 类名</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>MarkerPopup</h3>
+  <p>继承了 MapLibre GL 的 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/PopupOptions/" target="_blank" rel="noopener noreferrer">PopupOptions</a>（排除 <code className="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">className</code> 和 <code className="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">closeButton</code>）。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>弹窗内容</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>弹窗容器的额外 CSS 类名</td></tr>
+        <tr><td><code>closeButton</code></td><td><code>boolean</code></td><td>显示关闭按钮</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>MarkerTooltip</h3>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>提示内容</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>提示容器的额外 CSS 类名</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>MarkerLabel</h3>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>标签文字</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>标签的额外 CSS 类名</td></tr>
+        <tr><td><code>position</code></td><td><code>{`"top" | "bottom"`}</code></td><td><code>"top"</code></td><td>标签相对于标记的位置</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">弹窗</p>
+    </div>
+    <a href="/docs/popups" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapPopup 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

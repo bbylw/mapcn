@@ -1,0 +1,275 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="API 参考" description="所有 mapcn 地图组件及其属性的完整参考文档。">
+  <h1>API 参考</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    所有地图组件及其属性的完整参考。
+  </p>
+
+  <div class="p-4 rounded-xl bg-[var(--color-brand-500)]/5 border border-[var(--color-brand-500)]/20 mb-8">
+    <p class="text-sm text-[var(--color-brand-300)]">
+      💡 <strong>注意：</strong>此库基于
+      <a href="https://maplibre.org/maplibre-gl-js/docs/API/" target="_blank" rel="noopener noreferrer" class="text-[var(--color-brand-400)] underline">MapLibre GL JS</a>
+      构建。大多数组件扩展了原生 MapLibre 选项。未列出的选项请参考
+      <a href="https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/" target="_blank" rel="noopener noreferrer" class="text-[var(--color-brand-400)] underline">MapLibre Map API</a>。
+    </p>
+  </div>
+
+  <h2 id="component-anatomy">组件结构</h2>
+  <p>所有你可以使用和组合来构建地图的组件部分：</p>
+  <CodeBlock code={`<Map>
+  <MapMarker longitude={...} latitude={...}>
+    <MarkerContent>
+      <MarkerLabel />
+    </MarkerContent>
+    <MarkerPopup />
+    <MarkerTooltip />
+  </MapMarker>
+
+  <MapPopup longitude={...} latitude={...} />
+  <MapControls />
+  <MapRoute coordinates={...} />
+  <MapArc data={...} />
+  <MapGeoJSON data={...} />
+  <MapClusterLayer data={...} />
+</Map>`} lang="tsx" />
+
+  <h2 id="map">Map</h2>
+  <p>
+    根容器组件，初始化 MapLibre GL 并为子组件提供上下文。自动处理浅色和深色模式之间的主题切换。
+  </p>
+  <p class="text-sm text-[var(--color-text-tertiary)]">
+    继承 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/" target="_blank" rel="noopener noreferrer">MapOptions</a>（排除 <code>container</code> 和 <code>style</code>）。
+  </p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>子组件</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>容器额外 CSS 类名</td></tr>
+        <tr><td><code>theme</code></td><td><code>{`"light" | "dark"`}</code></td><td>自动检测</td><td>地图主题</td></tr>
+        <tr><td><code>styles</code></td><td><code>{`{ light?: string | StyleSpecification; dark?: string | StyleSpecification }`}</code></td><td>—</td><td>自定义地图样式</td></tr>
+        <tr><td><code>blank</code></td><td><code>boolean</code></td><td><code>false</code></td><td>透明无瓦片底图</td></tr>
+        <tr><td><code>projection</code></td><td><code>ProjectionSpecification</code></td><td>—</td><td>投影类型，如 3D 地球</td></tr>
+        <tr><td><code>viewport</code></td><td><code>{`Partial<MapViewport>`}</code></td><td>—</td><td>受控视口状态</td></tr>
+        <tr><td><code>onViewportChange</code></td><td><code>{`(viewport: MapViewport) => void`}</code></td><td>—</td><td>视口变化回调</td></tr>
+        <tr><td><code>loading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示加载指示器</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="usemap">useMap</h2>
+  <p>提供访问 MapLibre 地图实例和加载状态的 hook。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 组件内使用。</p>
+  <CodeBlock code={`const { map, isLoaded } = useMap();`} lang="tsx" />
+  <ul>
+    <li><code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">map</code> — MapLibre.Map 实例</li>
+    <li><code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">isLoaded</code> — 布尔值，表示地图是否已加载就绪</li>
+  </ul>
+
+  <h2 id="mapcontrols">MapControls</h2>
+  <p>渲染地图控制按钮（缩放、指北针、定位、全屏）。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内部使用。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>position</code></td><td><code>{`"top-left" | "top-right" | "bottom-left" | "bottom-right"`}</code></td><td><code>"bottom-right"</code></td><td>控件位置</td></tr>
+        <tr><td><code>showZoom</code></td><td><code>boolean</code></td><td><code>true</code></td><td>显示缩放按钮</td></tr>
+        <tr><td><code>showCompass</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示指北针</td></tr>
+        <tr><td><code>showLocate</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示定位按钮</td></tr>
+        <tr><td><code>showFullscreen</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示全屏按钮</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>额外 CSS 类名</td></tr>
+        <tr><td><code>onLocate</code></td><td><code>{`(coords: { longitude: number; latitude: number }) => void`}</code></td><td>—</td><td>定位回调</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="mapmarker">MapMarker</h2>
+  <p>标记相关组件的容器。为子组件提供上下文并处理标记定位。</p>
+  <p class="text-sm text-[var(--color-text-tertiary)]">
+    继承 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MarkerOptions/" target="_blank" rel="noopener noreferrer">MarkerOptions</a>（排除 <code>element</code>）。
+  </p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>longitude</code></td><td><code>number</code></td><td>—</td><td>经度</td></tr>
+        <tr><td><code>latitude</code></td><td><code>number</code></td><td>—</td><td>纬度</td></tr>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>标记子组件</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`(e: MouseEvent) => void`}</code></td><td>—</td><td>点击回调</td></tr>
+        <tr><td><code>onMouseEnter</code></td><td><code>{`(e: MouseEvent) => void`}</code></td><td>—</td><td>鼠标进入回调</td></tr>
+        <tr><td><code>onMouseLeave</code></td><td><code>{`(e: MouseEvent) => void`}</code></td><td>—</td><td>鼠标离开回调</td></tr>
+        <tr><td><code>onDragStart</code></td><td><code>{`(lngLat: {lng, lat}) => void`}</code></td><td>—</td><td>拖拽开始回调</td></tr>
+        <tr><td><code>onDrag</code></td><td><code>{`(lngLat: {lng, lat}) => void`}</code></td><td>—</td><td>拖拽中回调</td></tr>
+        <tr><td><code>onDragEnd</code></td><td><code>{`(lngLat: {lng, lat}) => void`}</code></td><td>—</td><td>拖拽结束回调</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="markercontent">MarkerContent</h2>
+  <p>渲染标记的视觉内容。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapMarker</code> 内使用。无 children 时渲染默认蓝色圆点。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>自定义标记内容，默认蓝色圆点</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>额外 CSS 类名</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="markerpopup">MarkerPopup</h2>
+  <p>渲染附加到标记的弹窗，点击时打开。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapMarker</code> 内使用。</p>
+  <p class="text-sm text-[var(--color-text-tertiary)]">
+    继承 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/PopupOptions/" target="_blank" rel="noopener noreferrer">PopupOptions</a>（排除 <code>className</code> 和 <code>closeButton</code>）。
+  </p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>弹窗内容</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>额外 CSS 类名</td></tr>
+        <tr><td><code>closeButton</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示关闭按钮</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="markertooltip">MarkerTooltip</h2>
+  <p>渲染悬停时显示的提示。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapMarker</code> 内使用。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>提示内容</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>额外 CSS 类名</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="markerlabel">MarkerLabel</h2>
+  <p>渲染标记上方或下方的文字标签。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MarkerContent</code> 内使用。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>标签文字</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>额外 CSS 类名</td></tr>
+        <tr><td><code>position</code></td><td><code>{`"top" | "bottom"`}</code></td><td><code>"top"</code></td><td>标签相对位置</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="mappopup">MapPopup</h2>
+  <p>独立弹窗组件，可放在地图任意位置，无需标记。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内使用。</p>
+  <p class="text-sm text-[var(--color-text-tertiary)]">
+    继承 <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/PopupOptions/" target="_blank" rel="noopener noreferrer">PopupOptions</a>（排除 <code>className</code> 和 <code>closeButton</code>）。
+  </p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>longitude</code></td><td><code>number</code></td><td>—</td><td>经度</td></tr>
+        <tr><td><code>latitude</code></td><td><code>number</code></td><td>—</td><td>纬度</td></tr>
+        <tr><td><code>onClose</code></td><td><code>{`() => void`}</code></td><td>—</td><td>关闭回调</td></tr>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>弹窗内容</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>额外 CSS 类名</td></tr>
+        <tr><td><code>closeButton</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示关闭按钮</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="maproute">MapRoute</h2>
+  <p>渲染连接坐标点的线/路线。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内使用。支持点击和悬停交互。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td><code>string</code></td><td>自动生成</td><td>路线图层唯一标识</td></tr>
+        <tr><td><code>coordinates</code></td><td><code>{`[number, number][]`}</code></td><td>—</td><td>坐标对数组</td></tr>
+        <tr><td><code>color</code></td><td><code>string</code></td><td><code>"#4285F4"</code></td><td>线条颜色</td></tr>
+        <tr><td><code>width</code></td><td><code>number</code></td><td><code>3</code></td><td>线条宽度（像素）</td></tr>
+        <tr><td><code>opacity</code></td><td><code>number</code></td><td><code>0.8</code></td><td>线条透明度</td></tr>
+        <tr><td><code>dashArray</code></td><td><code>{`[number, number]`}</code></td><td>—</td><td>虚线模式</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`() => void`}</code></td><td>—</td><td>点击回调</td></tr>
+        <tr><td><code>onMouseEnter</code></td><td><code>{`() => void`}</code></td><td>—</td><td>鼠标进入回调</td></tr>
+        <tr><td><code>onMouseLeave</code></td><td><code>{`() => void`}</code></td><td>—</td><td>鼠标离开回调</td></tr>
+        <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>false</code></td><td>响应鼠标事件</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="maparc">MapArc</h2>
+  <p>使用二次贝塞尔曲线渲染坐标对之间的弯曲弧线。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内使用。</p>
+  <p class="text-sm text-[var(--color-text-tertiary)]">
+    基于 MapLibre <a href="https://maplibre.org/maplibre-style-spec/layers/#line" target="_blank" rel="noopener noreferrer">线图层</a>。支持 MapLibre 表达式实现逐要素样式。
+  </p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>data</code></td><td><code>MapArcDatum[]</code></td><td>—</td><td>弧线数据数组</td></tr>
+        <tr><td><code>id</code></td><td><code>string</code></td><td>自动</td><td>源/图层 id 前缀</td></tr>
+        <tr><td><code>curvature</code></td><td><code>number</code></td><td><code>0.2</code></td><td>弯曲程度。0 为直线</td></tr>
+        <tr><td><code>samples</code></td><td><code>number</code></td><td><code>64</code></td><td>每条弧线采样点数</td></tr>
+        <tr><td><code>paint</code></td><td><code>LineLayerSpecification['paint']</code></td><td>默认蓝线</td><td>绘制属性，支持表达式</td></tr>
+        <tr><td><code>layout</code></td><td><code>LineLayerSpecification['layout']</code></td><td>默认圆角</td><td>布局属性</td></tr>
+        <tr><td><code>hoverPaint</code></td><td><code>LineLayerSpecification['paint']</code></td><td>—</td><td>悬停绘制覆盖</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`(e: MapArcEvent) => void`}</code></td><td>—</td><td>点击事件</td></tr>
+        <tr><td><code>onHover</code></td><td><code>{`(e: MapArcEvent | null) => void`}</code></td><td>—</td><td>悬停事件</td></tr>
+        <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>true</code></td><td>响应鼠标事件</td></tr>
+        <tr><td><code>beforeId</code></td><td><code>string</code></td><td>—</td><td>在此图层前插入</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="mapgeojson">MapGeoJSON</h2>
+  <p>将任意 GeoJSON 渲染为填充 + 轮廓图层。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内使用——通常配合 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">blank</code> 属性。</p>
+  <div class="overflow-x-auto mt-4 mb-8 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>data</code></td><td><code>{`FeatureCollection | Feature | Geometry | string`}</code></td><td>—</td><td>GeoJSON 数据或 URL</td></tr>
+        <tr><td><code>id</code></td><td><code>string</code></td><td>自动</td><td>源/图层 id 前缀</td></tr>
+        <tr><td><code>promoteId</code></td><td><code>string</code></td><td>—</td><td>提升为要素 id 的属性名</td></tr>
+        <tr><td><code>fillPaint</code></td><td><code>{`FillLayerSpecification['paint'] | false`}</code></td><td>主题感知</td><td>填充绘制属性。false 省略</td></tr>
+        <tr><td><code>linePaint</code></td><td><code>{`LineLayerSpecification['paint'] | false`}</code></td><td>主题感知</td><td>轮廓绘制属性。false 省略</td></tr>
+        <tr><td><code>fillHoverPaint</code></td><td><code>FillLayerSpecification['paint']</code></td><td>—</td><td>悬停填充覆盖。需 promoteId</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`(e: MapGeoJSONEvent) => void`}</code></td><td>—</td><td>点击事件</td></tr>
+        <tr><td><code>onHover</code></td><td><code>{`(e: MapGeoJSONEvent | null) => void`}</code></td><td>—</td><td>悬停事件</td></tr>
+        <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>false</code></td><td>响应鼠标事件</td></tr>
+        <tr><td><code>beforeId</code></td><td><code>string</code></td><td>—</td><td>在此图层前插入</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="mapclusterlayer">MapClusterLayer</h2>
+  <p>使用 MapLibre GL 原生聚类渲染聚类点数据。自动将附近点分组为聚类，点击展开。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内使用。</p>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead><tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr></thead>
+      <tbody>
+        <tr><td><code>data</code></td><td><code>{`string | GeoJSON.FeatureCollection`}</code></td><td>—</td><td>GeoJSON 数据或 URL</td></tr>
+        <tr><td><code>clusterMaxZoom</code></td><td><code>number</code></td><td><code>14</code></td><td>聚类最大缩放级别</td></tr>
+        <tr><td><code>clusterRadius</code></td><td><code>number</code></td><td><code>50</code></td><td>聚类半径（像素）</td></tr>
+        <tr><td><code>clusterColors</code></td><td><code>{`[string, string, string]`}</code></td><td>绿/黄/红</td><td>聚类颜色 [小, 中, 大]</td></tr>
+        <tr><td><code>clusterThresholds</code></td><td><code>{`[number, number]`}</code></td><td><code>[100, 750]</code></td><td>颜色/大小阈值 [中, 大]</td></tr>
+        <tr><td><code>pointColor</code></td><td><code>string</code></td><td><code>"#3b82f6"</code></td><td>未聚类点颜色</td></tr>
+        <tr><td><code>onPointClick</code></td><td><code>{`(feature, coordinates) => void`}</code></td><td>—</td><td>单点点击回调</td></tr>
+        <tr><td><code>onClusterClick</code></td><td><code>{`(clusterId, coordinates, pointCount) => void`}</code></td><td>放大展开</td><td>聚类点击回调</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">继续探索</p>
+      <p class="font-semibold">高级用法</p>
+    </div>
+    <a href="/docs/advanced-usage" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      useMap Hook 和自定义图层
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

@@ -1,0 +1,89 @@
+---
+const footerLinks = {
+  文档: [
+    { href: "/docs", label: "快速开始" },
+    { href: "/docs/installation", label: "安装指南" },
+    { href: "/docs/basic-map", label: "基础地图" },
+    { href: "/docs/api-reference", label: "API 参考" },
+  ],
+  组件: [
+    { href: "/docs/markers", label: "标记" },
+    { href: "/docs/popups", label: "弹窗" },
+    { href: "/docs/routes", label: "路线" },
+    { href: "/docs/arcs", label: "弧线" },
+    { href: "/docs/geojson", label: "GeoJSON" },
+    { href: "/docs/clusters", label: "聚类" },
+  ],
+  资源: [
+    { href: "https://github.com/AnmolSaini16/mapcn", label: "GitHub 仓库", external: true },
+    { href: "https://maplibre.org/", label: "MapLibre GL", external: true },
+    { href: "https://ui.shadcn.com/", label: "shadcn/ui", external: true },
+    { href: "https://www.mapcn.dev", label: "官方网站", external: true },
+  ],
+};
+
+const year = new Date().getFullYear();
+---
+
+<footer class="relative mt-24 border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]/50">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2.5 mb-4">
+          <svg viewBox="0 0 32 32" class="w-8 h-8" fill="none">
+            <rect x="2" y="2" width="28" height="28" rx="7" stroke="url(#footer-logo-grad)" stroke-width="1.5" />
+            <path d="M16 8C12.5 8 10 10.5 10 14C10 18 16 24 16 24C16 24 22 18 22 14C22 10.5 19.5 8 16 8Z" fill="url(#footer-logo-grad)" fill-opacity="0.15" stroke="url(#footer-logo-grad)" stroke-width="1.5" />
+            <circle cx="16" cy="14" r="2" fill="#22d3ee" />
+            <defs>
+              <linearGradient id="footer-logo-grad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#22d3ee" />
+                <stop offset="1" stop-color="#0891b2" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="font-display text-lg font-bold">mapcn</span>
+        </div>
+        <p class="text-sm text-[var(--color-text-tertiary)] leading-relaxed">
+          免费、开源的 React 地图组件库。基于 MapLibre GL，与 shadcn/ui 无缝协作。
+        </p>
+        <p class="mt-4 text-xs text-[var(--color-text-tertiary)]">
+          MIT 许可证 / 由社区驱动
+        </p>
+      </div>
+
+      <!-- Link columns -->
+      {Object.entries(footerLinks).map(([category, links]) => (
+        <div>
+          <h4 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">{category}</h4>
+          <ul class="space-y-2.5">
+            {links.map((link: any) => (
+              <li>
+                <a
+                  href={link.href}
+                  {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  class="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-brand-400)] transition-colors"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-10 pt-6 border-t border-[var(--color-border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-xs text-[var(--color-text-tertiary)]">
+        © {year} mapcn 中文文档 / 非官方网站，仅作翻译参考
+      </p>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/AnmolSaini16/mapcn" target="_blank" rel="noopener noreferrer" class="text-[var(--color-text-tertiary)] hover:text-[var(--color-brand-400)] transition-colors">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>

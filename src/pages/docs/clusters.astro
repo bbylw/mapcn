@@ -1,0 +1,159 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Clusters 聚类" description="使用 MapLibre 原生聚类功能可视化大型数据集，自动分组和展开点。">
+  <h1>Clusters 聚类</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    使用 MapLibre 内置聚类高效渲染大量点数据。点在低缩放级别自动分组为聚类，随缩放展开。
+  </p>
+
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapClusterLayer</code> 组件使用 MapLibre GL 的原生聚类功能。
+    自动将附近的点分组为聚类，点击聚类时放大展开。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内部使用。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <p>点击聚类放大，点击单个点查看详情弹窗：</p>
+  <CodeBlock code={`"use client";
+
+import { useState } from "react";
+import { Map, MapClusterLayer, MapPopup, MapControls } from "@/components/ui/map";
+
+interface EarthquakeProperties {
+  mag: number;
+  place: string;
+  tsunami: number;
+}
+
+export function ClusterExample() {
+  const [selectedPoint, setSelectedPoint] = useState<{
+    coordinates: [number, number];
+    properties: EarthquakeProperties;
+  } | null>(null);
+
+  return (
+    <div className="h-[420px] w-full">
+      <Map center={[-103.59, 40.66]} zoom={3.4} fadeDuration={0}>
+        <MapClusterLayer<EarthquakeProperties>
+          data="https://maplibre.org/maplibre-gl-js/docs/assets/earthquakes.geojson"
+          clusterRadius={50}
+          clusterMaxZoom={14}
+          clusterColors={["#1d8cf8", "#6d5dfc", "#e23670"]}
+          pointColor="#1d8cf8"
+          onPointClick={(feature, coordinates) => {
+            setSelectedPoint({
+              coordinates,
+              properties: feature.properties,
+            });
+          }}
+        />
+
+        {selectedPoint && (
+          <MapPopup
+            key={\`\${selectedPoint.coordinates[0]}-\${selectedPoint.coordinates[1]}\`}
+            longitude={selectedPoint.coordinates[0]}
+            latitude={selectedPoint.coordinates[1]}
+            onClose={() => setSelectedPoint(null)}
+            closeOnClick={false}
+            focusAfterOpen={false}
+            closeButton
+            className="w-34"
+          >
+            <div className="text-[13px]">
+              <p className="text-muted-foreground">
+                震级：{" "}
+                <span className="text-foreground font-medium">
+                  {selectedPoint.properties.mag}
+                </span>
+              </p>
+              <p className="text-muted-foreground">
+                海啸：{" "}
+                <span className="text-foreground font-medium">
+                  {selectedPoint.properties?.tsunami === 1 ? "是" : "否"}
+                </span>
+              </p>
+            </div>
+          </MapPopup>
+        )}
+
+        <MapControls />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="ClusterExample.tsx" />
+
+  <h2 id="custom-colors">自定义聚类颜色</h2>
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">clusterColors</code> 定义三个级别的聚类颜色，
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">clusterThresholds</code> 定义点数阈值：
+  </p>
+  <CodeBlock code={`<MapClusterLayer
+  data={earthquakeData}
+  clusterColors={[
+    "#22c55e",  // 小聚类（< 100 个点）
+    "#eab308",  // 中聚类（100-750 个点）
+    "#ef4444",  // 大聚类（> 750 个点）
+  ]}
+  clusterThresholds={[100, 750]}
+  pointColor="#3b82f6"
+/>`} lang="tsx" />
+
+  <h2 id="custom-cluster-click">自定义聚类点击</h2>
+  <p>默认点击聚类会放大展开。你也可以自定义点击行为：</p>
+  <CodeBlock code={`<MapClusterLayer
+  data={data}
+  onClusterClick={(clusterId, coordinates, pointCount) => {
+    console.log(\`聚类 \${clusterId} 包含 \${pointCount} 个点\`);
+    // 自定义逻辑，如显示聚类详情弹窗
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="typed">类型安全</h2>
+  <p>使用泛型类型参数实现类型安全的属性访问：</p>
+  <CodeBlock code={`interface StoreProperties {
+  name: string;
+  category: string;
+  isOpen: boolean;
+}
+
+<MapClusterLayer<StoreProperties>
+  data={storesGeoJSON}
+  onPointClick={(feature, coordinates) => {
+    // feature.properties 类型为 StoreProperties
+    console.log(feature.properties.name);
+    console.log(feature.properties.isOpen);
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="props">属性</h2>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>data</code></td><td><code>{`string | GeoJSON.FeatureCollection`}</code></td><td>—</td><td>GeoJSON 数据或获取数据的 URL</td></tr>
+        <tr><td><code>clusterMaxZoom</code></td><td><code>number</code></td><td><code>14</code></td><td>聚类点的最大缩放级别</td></tr>
+        <tr><td><code>clusterRadius</code></td><td><code>number</code></td><td><code>50</code></td><td>聚类点半径（像素）</td></tr>
+        <tr><td><code>clusterColors</code></td><td><code>{`[string, string, string]`}</code></td><td>绿/黄/红</td><td>聚类圆颜色：[小, 中, 大]</td></tr>
+        <tr><td><code>clusterThresholds</code></td><td><code>{`[number, number]`}</code></td><td><code>[100, 750]</code></td><td>颜色/大小阈值：[中, 大]</td></tr>
+        <tr><td><code>pointColor</code></td><td><code>string</code></td><td><code>"#3b82f6"</code></td><td>未聚类的单点颜色</td></tr>
+        <tr><td><code>onPointClick</code></td><td><code>{`(feature, coordinates) => void`}</code></td><td>—</td><td>单个点被点击时的回调</td></tr>
+        <tr><td><code>onClusterClick</code></td><td><code>{`(clusterId, coordinates, pointCount) => void`}</code></td><td>放大展开</td><td>聚类被点击时的回调。未提供时自动放大</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">高级用法</p>
+    </div>
+    <a href="/docs/advanced-usage" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      useMap Hook
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

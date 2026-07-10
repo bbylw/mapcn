@@ -1,0 +1,99 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="安装指南" description="了解如何安装 mapcn 地图组件库，包括依赖项和配置步骤。">
+  <h1>安装指南</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    一条命令安装 mapcn 地图组件库。
+  </p>
+
+  <h2 id="prerequisites">前提条件</h2>
+  <p>在安装 mapcn 之前，请确保你的项目满足以下条件：</p>
+  <ul>
+    <li>React 18 或更高版本</li>
+    <li>Tailwind CSS 已配置</li>
+    <li>shadcn/ui 已初始化（推荐）</li>
+    <li>Node.js 18 或更高版本</li>
+  </ul>
+
+  <h2 id="install">安装组件</h2>
+  <p>使用 shadcn CLI 安装 mapcn 基础地图组件：</p>
+  <CodeBlock code={`npx shadcn@latest add @mapcn/map`} lang="bash" />
+
+  <p>这将会：</p>
+  <ul>
+    <li>将 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">map.tsx</code> 文件复制到你的 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">components/ui/</code> 目录</li>
+    <li>自动安装 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">maplibre-gl</code> 和 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">lucide-react</code> 依赖</li>
+  </ul>
+
+  <h2 id="dependencies">依赖项</h2>
+  <p>mapcn 依赖以下包：</p>
+  <ul>
+    <li><code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">maplibre-gl</code> — 地图渲染引擎</li>
+    <li><code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">lucide-react</code> — 图标库</li>
+  </ul>
+  <p>如果你还没有安装这些依赖，shadcn CLI 会自动为你安装。</p>
+
+  <h2 id="manual-install">手动安装</h2>
+  <p>如果你不想使用 shadcn CLI，也可以手动安装：</p>
+  <CodeBlock code={`npm install maplibre-gl lucide-react`} lang="bash" />
+  <p>然后从 <a href="https://mapcn.dev/r/map.json" target="_blank" rel="noopener noreferrer">注册表</a> 下载 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">map.tsx</code> 文件并放入你的 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">components/ui/</code> 目录。</p>
+
+  <h2 id="import">导入使用</h2>
+  <p>安装完成后，从 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">@/components/ui/map</code> 导入组件：</p>
+  <CodeBlock code={`import { Map, MapControls } from "@/components/ui/map";
+
+export function MyMap() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        <MapControls />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MyMap.tsx" />
+
+  <h2 id="blocks">安装区块</h2>
+  <p>mapcn 还提供预构建的地图区块，覆盖常见业务场景：</p>
+  <CodeBlock code={`# 数据分析地图
+npx shadcn@latest add @mapcn/analytics-map
+
+# 等值线地图
+npx shadcn@latest add @mapcn/choropleth
+
+# 运行时间监控
+npx shadcn@latest add @mapcn/uptime-monitor
+
+# 物流网络
+npx shadcn@latest add @mapcn/logistics-network
+
+# 门店定位器
+npx shadcn@latest add @mapcn/store-locator
+
+# 热力图
+npx shadcn@latest add @mapcn/heatmap
+
+# 配送追踪器
+npx shadcn@latest add @mapcn/delivery-tracker`} lang="bash" />
+
+  <h2 id="basemap">底图选择</h2>
+  <p>mapcn 提供灵活的底图选择方式：</p>
+  <ul>
+    <li><strong>默认模式</strong> — 使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">&lt;Map&gt;</code> 不加 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">blank</code> 属性，使用默认的免费 CARTO 底图瓦片。适合门店定位、配送追踪、物流地图等需要街道和地理信息的场景。</li>
+    <li><strong>空白模式</strong> — 使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">&lt;Map blank&gt;</code> 获取透明、无瓦片的画布。单独使用时不渲染任何内容，需要添加自己的图层。适合等值线图、弧线图、点地图、数据仪表板等数据驱动的可视化。</li>
+    <li><strong>自定义样式</strong> — 使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">styles</code> 属性指定自定义 MapLibre 兼容的样式 URL 或样式对象，例如 MapTiler、OpenFreeMap、CARTO 或自托管样式。显式 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">styles</code> 会覆盖 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">blank</code>。</li>
+  </ul>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">基础地图</p>
+    </div>
+    <a href="/docs/basic-map" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      了解 Map 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

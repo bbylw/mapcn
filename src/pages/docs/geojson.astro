@@ -1,0 +1,161 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="GeoJSON" description="渲染任意 GeoJSON 数据为填充和轮廓图层，支持数据驱动样式和悬停交互。">
+  <h1>GeoJSON</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    将任意 GeoJSON 渲染为填充和轮廓图层。支持数据驱动样式和悬停高亮。
+  </p>
+
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapGeoJSON</code> 将任意 GeoJSON 渲染为填充 + 轮廓图层。
+    必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内部使用——通常配合
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">blank</code> 属性用于等值线和区域/数据地图。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <CodeBlock code={`import { Map, MapGeoJSON } from "@/components/ui/map";
+
+const WORLD_GEOJSON =
+  "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@v5.1.2/geojson/ne_110m_admin_0_countries.geojson";
+
+export function GeoJSONMap() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map blank center={[0, 20]} zoom={1}>
+        <MapGeoJSON data={WORLD_GEOJSON} />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="GeoJSONMap.tsx" />
+
+  <h2 id="custom-fill">自定义填充和轮廓</h2>
+  <p>
+    通过 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">fillPaint</code> 和
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">linePaint</code> 自定义图层样式。
+    传入 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">false</code> 可省略对应图层：
+  </p>
+  <CodeBlock code={`<MapGeoJSON
+  data={WORLD_GEOJSON}
+  fillPaint={{
+    "fill-color": "#22d3ee",
+    "fill-opacity": 0.3,
+  }}
+  linePaint={{
+    "line-color": "#0891b2",
+    "line-width": 1,
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="data-driven">数据驱动样式</h2>
+  <p>使用 MapLibre 表达式根据属性值设置样式：</p>
+  <CodeBlock code={`<MapGeoJSON
+  data={WORLD_GEOJSON}
+  promoteId="name"
+  fillPaint={{
+    "fill-color": [
+      "match",
+      ["get", "continent"],
+      "Asia", "#f59e0b",
+      "Europe", "#22d3ee",
+      "Africa", "#22c55e",
+      "North America", "#3b82f6",
+      "South America", "#a855f7",
+      "#64748b",
+    ],
+    "fill-opacity": 0.5,
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="hover">悬停高亮</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">fillHoverPaint</code> 和 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">promoteId</code> 实现悬停高亮：</p>
+  <CodeBlock code={`<MapGeoJSON
+  data={WORLD_GEOJSON}
+  promoteId="name"
+  interactive
+  fillPaint={{
+    "fill-color": "#1a2332",
+    "fill-opacity": 0.6,
+  }}
+  fillHoverPaint={{
+    "fill-color": "#22d3ee",
+    "fill-opacity": 0.5,
+  }}
+  linePaint={{
+    "line-color": "#0891b2",
+    "line-width": 0.5,
+  }}
+  onHover={(e) => {
+    if (e) console.log("悬停:", e.feature.properties.name);
+  }}
+  onClick={(e) => {
+    console.log("点击:", e.feature.properties.name);
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="outline-only">仅轮廓</h2>
+  <p>传入 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">fillPaint: false</code> 仅渲染轮廓：</p>
+  <CodeBlock code={`<MapGeoJSON
+  data={WORLD_GEOJSON}
+  fillPaint={false}
+  linePaint={{
+    "line-color": "#22d3ee",
+    "line-width": 1,
+    "line-opacity": 0.5,
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="typed-props">类型安全的属性</h2>
+  <p>使用泛型类型参数实现类型安全的属性访问：</p>
+  <CodeBlock code={`interface CountryProperties {
+  name: string;
+  population: number;
+  continent: string;
+}
+
+<MapGeoJSON<CountryProperties>
+  data={WORLD_GEOJSON}
+  promoteId="name"
+  fillPaint={{
+    "fill-color": ["get", "continent"],
+  }}
+  onClick={(e) => {
+    // e.feature.properties 类型为 CountryProperties
+    console.log(e.feature.properties.population);
+  }}
+/>`} lang="tsx" />
+
+  <h2 id="props">属性</h2>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>data</code></td><td><code>{`FeatureCollection | Feature | Geometry | string`}</code></td><td>—</td><td>GeoJSON 数据或获取数据的 URL</td></tr>
+        <tr><td><code>id</code></td><td><code>string</code></td><td>自动生成</td><td>源/图层 id 前缀</td></tr>
+        <tr><td><code>promoteId</code></td><td><code>string</code></td><td>—</td><td>提升为要素 id 的属性名。悬停 feature-state 必需</td></tr>
+        <tr><td><code>fillPaint</code></td><td><code>{`FillLayerSpecification['paint'] | false`}</code></td><td>主题感知默认</td><td>填充图层绘制属性。传 false 省略填充</td></tr>
+        <tr><td><code>linePaint</code></td><td><code>{`LineLayerSpecification['paint'] | false`}</code></td><td>主题感知默认</td><td>轮廓图层绘制属性。传 false 省略轮廓</td></tr>
+        <tr><td><code>fillHoverPaint</code></td><td><code>FillLayerSpecification['paint']</code></td><td>—</td><td>悬停时合并到填充图层的绘制属性。需要 promoteId</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`(e: MapGeoJSONEvent) => void`}</code></td><td>—</td><td>要素点击事件</td></tr>
+        <tr><td><code>onHover</code></td><td><code>{`(e: MapGeoJSONEvent | null) => void`}</code></td><td>—</td><td>悬停要素变化事件</td></tr>
+        <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>false</code></td><td>响应鼠标事件</td></tr>
+        <tr><td><code>beforeId</code></td><td><code>string</code></td><td>—</td><td>在此图层 id 之前插入图层</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">聚类</p>
+    </div>
+    <a href="/docs/clusters" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapClusterLayer 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

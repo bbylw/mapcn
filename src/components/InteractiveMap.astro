@@ -1,0 +1,140 @@
+---
+/**
+ * InteractiveMap.astro
+ * Renders a map container. The actual MapLibre GL JS initialization
+ * happens in BaseLayout.astro's global script (loaded once).
+ */
+
+interface Props {
+  variant?: "hero" | "markers" | "routes" | "arcs" | "geojson" | "clusters" | "blank";
+  class?: string;
+  height?: string;
+}
+
+const {
+  variant = "hero",
+  class: className = "",
+  height = "400px",
+} = Astro.props;
+
+const variantConfig: Record<string, { center: [number, number]; zoom: number }> = {
+  hero: { center: [-74.006, 40.7128], zoom: 11 },
+  markers: { center: [-73.9857, 40.7484], zoom: 12.5 },
+  routes: { center: [-73.99, 40.755], zoom: 12 },
+  arcs: { center: [-95, 39], zoom: 3.4 },
+  geojson: { center: [0, 20], zoom: 1 },
+  clusters: { center: [-103.59, 40.66], zoom: 3.4 },
+  blank: { center: [0, 20], zoom: 1.5 },
+};
+
+const cfg = variantConfig[variant] || variantConfig.hero;
+---
+
+<div
+  class:list={["mapcn-map-root", className]}
+  data-map-variant={variant}
+  data-map-center={JSON.stringify(cfg.center)}
+  data-map-zoom={cfg.zoom}
+  style={`height: ${height}; width: 100%; position: relative;`}
+>
+  <div class="mapcn-map-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+</div>
+
+<style is:global>
+  .mapcn-map-root {
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #0a1929;
+  }
+  .mapcn-map-container {
+    background: #0a1929;
+  }
+  .mapcn-map-container .maplibregl-map {
+    font-family: "DM Sans", sans-serif;
+  }
+  .mapcn-map-container .maplibregl-ctrl-group {
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  .mapcn-map-container .maplibregl-ctrl-group button {
+    background: #111821 !important;
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .mapcn-map-container .maplibregl-ctrl-group button span {
+    filter: invert(0.8);
+  }
+  .mapcn-map-container .maplibregl-ctrl-group button:hover {
+    background: #243144 !important;
+  }
+  .mapcn-map-container .maplibregl-popup-content {
+    background: #111821 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  .mapcn-map-container .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: #111821 !important;
+  }
+  .mapcn-map-container .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: #111821 !important;
+  }
+  .mapcn-map-container .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: #111821 !important;
+  }
+  .mapcn-map-container .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: #111821 !important;
+  }
+  .mapcn-map-container .maplibregl-popup-close-button {
+    color: #94a3b8;
+    font-size: 16px;
+    padding: 2px 6px;
+  }
+  .mapcn-map-container .maplibregl-popup-close-button:hover {
+    background: transparent;
+    color: #e2e8f0;
+  }
+  .mapcn-map-container .maplibregl-ctrl-attrib {
+    background: rgba(17, 24, 33, 0.7) !important;
+    color: #64748b;
+    font-size: 10px;
+  }
+  .mapcn-map-container .maplibregl-ctrl-attrib a {
+    color: #64748b;
+  }
+
+  .custom-marker {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .custom-marker:hover {
+    transform: scale(1.2);
+  }
+  .marker-blue { background: #3b82f6; }
+  .marker-cyan { background: #06b6d4; }
+  .marker-amber { background: #f59e0b; }
+  .marker-green { background: #22c55e; }
+  .marker-purple { background: #a855f7; }
+  .marker-red { background: #ef4444; }
+
+  .marker-label {
+    background: #111821;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+</style>

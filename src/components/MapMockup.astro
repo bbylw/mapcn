@@ -1,0 +1,298 @@
+---
+interface Props {
+  variant?: "hero" | "markers" | "routes" | "arcs" | "geojson" | "clusters" | "blank";
+  class?: string;
+}
+
+const { variant = "hero", class: className = "" } = Astro.props;
+---
+
+<div class:list={["relative overflow-hidden rounded-2xl", className]}>
+  <svg viewBox="0 0 800 500" class="w-full h-full" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id={`water-${variant}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0a1929" />
+        <stop offset="100%" stop-color="#0d2840" />
+      </linearGradient>
+      <linearGradient id={`land-${variant}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#0f1620" />
+        <stop offset="100%" stop-color="#141d2b" />
+      </linearGradient>
+      <radialGradient id={`glow-${variant}`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.08" />
+        <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+      </radialGradient>
+      <filter id={`shadow-${variant}`}>
+        <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.3" />
+      </filter>
+    </defs>
+
+    {/* Base land */}
+    <rect width="800" height="500" fill={`url(#land-${variant})`} />
+
+    {/* Water bodies */}
+    {variant === "hero" && (
+      <>
+        <path d="M0,350 Q200,320 400,340 T800,330 L800,500 L0,500 Z" fill={`url(#water-${variant})`} opacity="0.8" />
+        <path d="M550,0 Q600,100 580,200 Q570,250 600,300" fill="none" stroke="#1a3a5c" stroke-width="40" opacity="0.5" />
+      </>
+    )}
+    {variant === "blank" && (
+      <rect width="800" height="500" fill="transparent" />
+    )}
+    {variant !== "hero" && variant !== "blank" && (
+      <>
+        <path d="M0,380 Q150,360 300,375 Q450,390 600,365 T800,370 L800,500 L0,500 Z" fill={`url(#water-${variant})`} opacity="0.6" />
+      </>
+    )}
+
+    {/* Glow overlay */}
+    <rect width="800" height="500" fill={`url(#glow-${variant})`} />
+
+    {/* Street grid - horizontal roads */}
+    {variant !== "blank" && [...Array(12)].map((_, i) => {
+      const y = 40 + i * 40;
+      return <line x1="0" y1={y} x2="800" y2={y} stroke="#1e2a3a" stroke-width="1" opacity="0.5" />;
+    })}
+    {/* Street grid - vertical roads */}
+    {variant !== "blank" && [...Array(20)].map((_, i) => {
+      const x = 40 + i * 40;
+      return <line x1={x} y1="0" x2={x} y2="500" stroke="#1e2a3a" stroke-width="1" opacity="0.5" />;
+    })}
+
+    {/* Major roads */}
+    {variant !== "blank" && (
+      <>
+        <path d="M50,100 Q200,150 350,120 T700,180" fill="none" stroke="#2a3a52" stroke-width="3" opacity="0.6" />
+        <path d="M100,400 Q300,350 500,380 T780,350" fill="none" stroke="#2a3a52" stroke-width="3" opacity="0.6" />
+        <path d="M400,0 L420,500" stroke="#2a3a52" stroke-width="2.5" opacity="0.5" />
+      </>
+    )}
+
+    {/* Park / green areas */}
+    {variant !== "blank" && (
+      <>
+        <rect x="120" y="200" width="100" height="70" rx="8" fill="#13261c" opacity="0.7" />
+        <rect x="500" y="80" width="80" height="60" rx="8" fill="#13261c" opacity="0.7" />
+      </>
+    )}
+
+    {/* Building blocks */}
+    {variant !== "blank" && [...Array(30)].map((_, i) => {
+      const x = (i % 6) * 130 + 30 + (i % 3) * 15;
+      const y = Math.floor(i / 6) * 100 + 30 + (i % 2) * 20;
+      const w = 30 + (i % 4) * 10;
+      const h = 25 + (i % 3) * 8;
+      return <rect x={x} y={y} width={w} height={h} rx="2" fill="#161e2b" stroke="#1e2838" stroke-width="0.5" opacity="0.6" />;
+    })}
+
+    {/* === VARIANT SPECIFIC OVERLAYS === */}
+
+    {/* HERO: Markers with pulse + route */}
+    {variant === "hero" && (
+      <>
+        {/* Route line */}
+        <path d="M150,280 Q250,200 350,250 T550,180 Q650,140 700,200" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round" opacity="0.7" stroke-dasharray="8 4" class="animate-draw-line" />
+        {/* Markers */}
+        <g filter={`url(#shadow-${variant})`}>
+          <circle cx="150" cy="280" r="8" fill="#06b6d4" />
+          <circle cx="150" cy="280" r="14" fill="none" stroke="#06b6d4" stroke-width="1.5" opacity="0.4" />
+          <circle cx="150" cy="280" r="20" fill="none" stroke="#06b6d4" stroke-width="1" opacity="0.2" />
+        </g>
+        <g filter={`url(#shadow-${variant})`}>
+          <circle cx="450" cy="220" r="8" fill="#f59e0b" />
+          <circle cx="450" cy="220" r="14" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0.4" />
+          <circle cx="450" cy="220" r="20" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.2" />
+        </g>
+        <g filter={`url(#shadow-${variant})`}>
+          <circle cx="700" cy="200" r="8" fill="#06b6d4" />
+          <circle cx="700" cy="200" r="14" fill="none" stroke="#06b6d4" stroke-width="1.5" opacity="0.4" />
+        </g>
+        {/* Popup */}
+        <g transform="translate(440, 100)">
+          <rect width="120" height="56" rx="8" fill="#111821" stroke="#243144" stroke-width="1" filter={`url(#shadow-${variant})`} />
+          <path d="M50,56 L60,68 L70,56 Z" fill="#111821" stroke="#243144" stroke-width="1" />
+          <text x="12" y="22" fill="#e2e8f0" font-size="11" font-family="DM Sans, sans-serif" font-weight="600">帝国大厦</text>
+          <text x="12" y="40" fill="#64748b" font-size="9" font-family="DM Sans, sans-serif">40.7484° N, 73.9857° W</text>
+        </g>
+      </>
+    )}
+
+    {/* MARKERS: Multiple marker types */}
+    {variant === "markers" && (
+      <>
+        {/* Default blue dot */}
+        <g transform="translate(200, 200)">
+          <circle r="8" fill="#3b82f6" />
+          <circle r="14" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.3" />
+        </g>
+        {/* Custom marker with label */}
+        <g transform="translate(350, 150)">
+          <rect x="-20" y="-20" width="40" height="40" rx="10" fill="#06b6d4" filter={`url(#shadow-${variant})`} />
+          <text x="0" y="5" fill="white" font-size="14" text-anchor="middle" font-weight="bold">A</text>
+          <rect x="-25" y="-40" width="50" height="16" rx="4" fill="#111821" stroke="#243144" stroke-width="0.5" />
+          <text x="0" y="-29" fill="#e2e8f0" font-size="9" text-anchor="middle" font-family="DM Sans, sans-serif">站点 A</text>
+        </g>
+        {/* Pin marker */}
+        <g transform="translate(550, 280)">
+          <path d="M0,-20 C-10,-20 -15,-12 -15,-5 C-15,5 0,18 0,18 C0,18 15,5 15,-5 C15,-12 10,-20 0,-20 Z" fill="#f59e0b" filter={`url(#shadow-${variant})`} />
+          <circle cx="0" cy="-6" r="5" fill="#111821" />
+        </g>
+        {/* Marker with popup */}
+        <g transform="translate(150, 320)">
+          <circle r="8" fill="#22c55e" />
+          <rect x="12" y="-25" width="100" height="44" rx="6" fill="#111821" stroke="#243144" stroke-width="1" filter={`url(#shadow-${variant})`} />
+          <text x="20" y="-8" fill="#e2e8f0" font-size="10" font-weight="600">中央公园</text>
+          <text x="20" y="6" fill="#64748b" font-size="8">面积: 3.41 km²</text>
+          <text x="20" y="16" fill="#64748b" font-size="8">类型: 公园</text>
+        </g>
+      </>
+    )}
+
+    {/* ROUTES: Multiple route styles */}
+    {variant === "routes" && (
+      <>
+        {/* Solid route */}
+        <path d="M80,350 Q200,280 300,300 Q400,320 500,250 T720,200" fill="none" stroke="#22d3ee" stroke-width="4" stroke-linecap="round" opacity="0.8" />
+        {/* Dashed route */}
+        <path d="M100,150 Q250,100 400,180 Q550,260 700,220" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 6" opacity="0.7" />
+        {/* Thick route */}
+        <path d="M150,400 L300,380 L400,320 L550,350 L700,300" fill="none" stroke="#a855f7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6" />
+        {/* Start/end markers */}
+        <circle cx="80" cy="350" r="6" fill="#22d3ee" />
+        <circle cx="720" cy="200" r="6" fill="#22d3ee" />
+        <circle cx="100" cy="150" r="6" fill="#f59e0b" />
+        <circle cx="700" cy="220" r="6" fill="#f59e0b" />
+      </>
+    )}
+
+    {/* ARCS: Curved connections */}
+    {variant === "arcs" && (
+      <>
+        {/* Arc 1: NYC to LA */}
+        <path d="M150,200 Q400,50 650,250" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+        {/* Arc 2: NYC to Chicago */}
+        <path d="M150,200 Q250,120 350,180" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+        {/* Arc 3: LA to Seattle */}
+        <path d="M650,250 Q600,100 500,80" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+        {/* Arc 4: Chicago to Miami */}
+        <path d="M350,180 Q450,350 550,380" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" opacity="0.7" />
+        {/* City markers */}
+        <g>
+          <circle cx="150" cy="200" r="7" fill="#06b6d4" />
+          <circle cx="150" cy="200" r="12" fill="none" stroke="#06b6d4" stroke-width="1" opacity="0.4" />
+          <text x="120" y="185" fill="#94a3b8" font-size="9" font-family="DM Sans, sans-serif">纽约</text>
+        </g>
+        <g>
+          <circle cx="650" cy="250" r="7" fill="#f59e0b" />
+          <circle cx="650" cy="250" r="12" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.4" />
+          <text x="625" y="275" fill="#94a3b8" font-size="9" font-family="DM Sans, sans-serif">洛杉矶</text>
+        </g>
+        <g>
+          <circle cx="350" cy="180" r="6" fill="#a855f7" />
+          <text x="355" y="175" fill="#94a3b8" font-size="9" font-family="DM Sans, sans-serif">芝加哥</text>
+        </g>
+        <g>
+          <circle cx="500" cy="80" r="6" fill="#22c55e" />
+          <text x="475" y="70" fill="#94a3b8" font-size="9" font-family="DM Sans, sans-serif">西雅图</text>
+        </g>
+        <g>
+          <circle cx="550" cy="380" r="6" fill="#ef4444" />
+          <text x="555" y="395" fill="#94a3b8" font-size="9" font-family="DM Sans, sans-serif">迈阿密</text>
+        </g>
+      </>
+    )}
+
+    {/* GEOJSON: Region fills */}
+    {variant === "geojson" && (
+      <>
+        {/* Country-like shapes */}
+        <path d="M100,120 L200,100 L280,140 L260,220 L180,240 L120,200 Z" fill="#22d3ee" fill-opacity="0.15" stroke="#22d3ee" stroke-width="1.5" opacity="0.8" />
+        <path d="M300,80 L420,90 L460,160 L400,200 L320,180 Z" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.5" opacity="0.8" />
+        <path d="M500,140 L620,120 L680,180 L640,260 L540,250 L490,200 Z" fill="#a855f7" fill-opacity="0.15" stroke="#a855f7" stroke-width="1.5" opacity="0.8" />
+        <path d="M200,300 L340,290 L380,360 L300,400 L220,380 Z" fill="#22c55e" fill-opacity="0.15" stroke="#22c55e" stroke-width="1.5" opacity="0.8" />
+        <path d="M440,320 L560,310 L600,380 L520,420 L440,400 Z" fill="#ef4444" fill-opacity="0.15" stroke="#ef4444" stroke-width="1.5" opacity="0.8" />
+        {/* Hover highlight on one */}
+        <path d="M300,80 L420,90 L460,160 L400,200 L320,180 Z" fill="#f59e0b" fill-opacity="0.35" stroke="#f59e0b" stroke-width="2" />
+        <text x="360" y="140" fill="#fbbf24" font-size="11" font-family="DM Sans, sans-serif" font-weight="600">亚洲</text>
+        <text x="160" y="170" fill="#67e8f9" font-size="11" font-family="DM Sans, sans-serif" font-weight="600">北美</text>
+        <text x="560" y="200" fill="#c084fc" font-size="11" font-family="DM Sans, sans-serif" font-weight="600">欧洲</text>
+      </>
+    )}
+
+    {/* CLUSTERS: Clustered points */}
+    {variant === "clusters" && (
+      <>
+        {/* Large cluster */}
+        <g transform="translate(250, 200)">
+          <circle r="32" fill="#ef4444" fill-opacity="0.85" filter={`url(#shadow-${variant})`} />
+          <circle r="38" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.3" />
+          <text x="0" y="6" fill="white" font-size="16" font-weight="bold" text-anchor="middle" font-family="DM Sans, sans-serif">856</text>
+        </g>
+        {/* Medium cluster */}
+        <g transform="translate(500, 150)">
+          <circle r="24" fill="#eab308" fill-opacity="0.85" filter={`url(#shadow-${variant})`} />
+          <circle r="30" fill="none" stroke="#eab308" stroke-width="1.5" opacity="0.3" />
+          <text x="0" y="5" fill="white" font-size="13" font-weight="bold" text-anchor="middle" font-family="DM Sans, sans-serif">234</text>
+        </g>
+        {/* Small cluster */}
+        <g transform="translate(620, 320)">
+          <circle r="18" fill="#22c55e" fill-opacity="0.85" filter={`url(#shadow-${variant})`} />
+          <circle r="24" fill="none" stroke="#22c55e" stroke-width="1.5" opacity="0.3" />
+          <text x="0" y="4" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="DM Sans, sans-serif">42</text>
+        </g>
+        {/* Individual points */}
+        <circle cx="150" cy="120" r="5" fill="#3b82f6" />
+        <circle cx="180" cy="300" r="5" fill="#3b82f6" />
+        <circle cx="380" cy="350" r="5" fill="#3b82f6" />
+        <circle cx="450" cy="280" r="5" fill="#3b82f6" />
+        <circle cx="580" cy="220" r="5" fill="#3b82f6" />
+        <circle cx="700" cy="180" r="5" fill="#3b82f6" />
+        <circle cx="350" cy="100" r="5" fill="#3b82f6" />
+        <circle cx="680" cy="400" r="5" fill="#3b82f6" />
+        <circle cx="120" cy="400" r="5" fill="#3b82f6" />
+      </>
+    )}
+
+    {/* Controls overlay (all variants except blank) */}
+    {variant !== "blank" && (
+      <g transform="translate(740, 20)">
+        <rect width="36" height="76" rx="6" fill="#111821" stroke="#243144" stroke-width="1" filter={`url(#shadow-${variant})`} />
+        {/* Zoom in */}
+        <line x1="18" y1="10" x2="18" y2="24" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="11" y1="17" x2="25" y2="17" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="8" y1="34" x2="28" y2="34" stroke="#243144" stroke-width="1" />
+        {/* Zoom out */}
+        <line x1="11" y1="46" x2="25" y2="46" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="8" y1="56" x2="28" y2="56" stroke="#243144" stroke-width="1" />
+        {/* Compass */}
+        <circle cx="18" cy="66" r="6" fill="none" stroke="#e2e8f0" stroke-width="1" />
+        <path d="M18,61 L21,66 L18,71 L15,66 Z" fill="#22d3ee" />
+      </g>
+    )}
+
+    {/* Scale bar */}
+    {variant !== "blank" && (
+      <g transform="translate(20, 470)">
+        <line x1="0" y1="0" x2="60" y2="0" stroke="#64748b" stroke-width="1.5" />
+        <line x1="0" y1="-4" x2="0" y2="4" stroke="#64748b" stroke-width="1.5" />
+        <line x1="30" y1="-3" x2="30" y2="3" stroke="#64748b" stroke-width="1" />
+        <line x1="60" y1="-4" x2="60" y2="4" stroke="#64748b" stroke-width="1.5" />
+        <text x="0" y="16" fill="#64748b" font-size="8" font-family="JetBrains Mono, monospace">0</text>
+        <text x="52" y="16" fill="#64748b" font-size="8" font-family="JetBrains Mono, monospace">2km</text>
+      </g>
+    )}
+  </svg>
+
+  <!-- Pulsing marker animation overlay (CSS) -->
+  {variant === "hero" && (
+    <div class="absolute" style="left: 18.75%; top: 56%; pointer-events: none;">
+      <div class="map-pin"></div>
+    </div>
+  )}
+  {variant === "hero" && (
+    <div class="absolute" style="left: 56.25%; top: 44%; pointer-events: none;">
+      <div class="map-pin" style="background: var(--color-accent-500); box-shadow: 0 0 0 4px rgba(245,158,11,0.2);"></div>
+    </div>
+  )}
+</div>

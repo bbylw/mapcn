@@ -1,0 +1,154 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Popups 弹窗" description="独立弹窗组件，可在地图上任意位置显示信息。">
+  <h1>Popups 弹窗</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    独立弹窗组件，可以放置在地图上的任意位置，无需附加到标记。
+  </p>
+
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapPopup</code> 是一个独立弹窗组件，
+    可以放在地图上的任何位置而不需要标记。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内部使用。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <CodeBlock code={`import { Map, MapPopup } from "@/components/ui/map";
+
+export function MapWithPopup() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        <MapPopup
+          longitude={-74.006}
+          latitude={40.7128}
+          closeButton
+        >
+          <div className="p-2">
+            <h3 className="font-semibold">纽约市</h3>
+            <p className="text-sm text-muted-foreground">
+              美国人口最多的城市
+            </p>
+          </div>
+        </MapPopup>
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MapWithPopup.tsx" />
+
+  <h2 id="controlled">受控弹窗</h2>
+  <p>通过状态控制弹窗的显示和隐藏：</p>
+  <CodeBlock code={`import { Map, MapPopup } from "@/components/ui/map";
+import { useState } from "react";
+
+export function ControlledPopup() {
+  const [show, setShow] = useState(true);
+
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        {show && (
+          <MapPopup
+            longitude={-74.006}
+            latitude={40.7128}
+            closeButton
+            onClose={() => setShow(false)}
+          >
+            <div className="p-2">
+              <p>点击关闭按钮隐藏弹窗</p>
+            </div>
+          </MapPopup>
+        )}
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="ControlledPopup.tsx" />
+
+  <h2 id="click-popup">点击地图显示弹窗</h2>
+  <p>结合 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">useMap</code> hook 实现点击地图显示弹窗：</p>
+  <CodeBlock code={`"use client";
+
+import { Map, MapPopup, useMap } from "@/components/ui/map";
+import { useEffect, useState } from "react";
+
+function ClickHandler() {
+  const { map, isLoaded } = useMap();
+  const [popup, setPopup] = useState<{
+    lng: number;
+    lat: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+
+    const handleClick = (e) => {
+      setPopup({ lng: e.lngLat.lng, lat: e.lngLat.lat });
+    };
+
+    map.on("click", handleClick);
+    return () => map.off("click", handleClick);
+  }, [map, isLoaded]);
+
+  if (!popup) return null;
+
+  return (
+    <MapPopup
+      longitude={popup.lng}
+      latitude={popup.lat}
+      closeButton
+      onClose={() => setPopup(null)}
+      closeOnClick
+    >
+      <div className="text-sm">
+        <p>坐标：</p>
+        <p className="font-mono">{popup.lat.toFixed(4)}, {popup.lng.toFixed(4)}</p>
+      </div>
+    </MapPopup>
+  );
+}
+
+export function ClickPopupMap() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        <ClickHandler />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="ClickPopupMap.tsx" />
+
+  <h2 id="props">属性</h2>
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">MapPopup</code> 继承了 MapLibre GL 的
+    <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/PopupOptions/" target="_blank" rel="noopener noreferrer">PopupOptions</a>
+    （排除 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">className</code> 和 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">closeButton</code>）。
+  </p>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>longitude</code></td><td><code>number</code></td><td>—</td><td>弹窗位置经度</td></tr>
+        <tr><td><code>latitude</code></td><td><code>number</code></td><td>—</td><td>弹窗位置纬度</td></tr>
+        <tr><td><code>onClose</code></td><td><code>{`() => void`}</code></td><td>—</td><td>弹窗关闭时的回调</td></tr>
+        <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>弹窗内容</td></tr>
+        <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>弹窗容器的额外 CSS 类名</td></tr>
+        <tr><td><code>closeButton</code></td><td><code>boolean</code></td><td><code>false</code></td><td>显示关闭按钮</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">路线</p>
+    </div>
+    <a href="/docs/routes" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapRoute 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

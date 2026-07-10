@@ -1,0 +1,138 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Controls 控件" description="地图控件组件，包括缩放、指北针、定位和全屏按钮。">
+  <h1>Controls 控件</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    渲染地图控制按钮（缩放、指北针、定位、全屏）。必须在 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 内部使用。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <p>默认情况下，只显示缩放按钮，位于地图右下角：</p>
+  <CodeBlock code={`import { Map, MapControls } from "@/components/ui/map";
+
+export function MapWithControls() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        <MapControls />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MapWithControls.tsx" />
+
+  <h2 id="all-controls">显示所有控件</h2>
+  <p>启用所有控件按钮：</p>
+  <CodeBlock code={`<Map center={[-74.006, 40.7128]} zoom={11}>
+  <MapControls
+    showZoom
+    showCompass
+    showLocate
+    showFullscreen
+  />
+</Map>`} lang="tsx" />
+
+  <h2 id="position">控件位置</h2>
+  <p>通过 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">position</code> 属性控制控件位置：</p>
+  <CodeBlock code={`<Map center={[-74.006, 40.7128]} zoom={11}>
+  <MapControls position="top-left" showZoom showCompass />
+</Map>`} lang="tsx" />
+
+  <h2 id="locate">定位回调</h2>
+  <p>当用户点击定位按钮时，获取用户坐标：</p>
+  <CodeBlock code={`import { Map, MapControls } from "@/components/ui/map";
+import { useState } from "react";
+
+export function LocateMap() {
+  const [coords, setCoords] = useState(null);
+
+  return (
+    <>
+      <div className="h-[320px] overflow-hidden rounded-lg">
+        <Map center={[-74.006, 40.7128]} zoom={11}>
+          <MapControls
+            showLocate
+            onLocate={(c) => setCoords(c)}
+          />
+        </Map>
+      </div>
+      {coords && (
+        <p className="mt-2 text-sm text-muted-foreground">
+          你的位置：{coords.latitude.toFixed(4)}, {coords.longitude.toFixed(4)}
+        </p>
+      )}
+    </>
+  );
+}`} lang="tsx" title="LocateMap.tsx" />
+
+  <h2 id="props">属性</h2>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>属性</th>
+          <th>类型</th>
+          <th>默认值</th>
+          <th>描述</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>position</code></td>
+          <td><code>{`"top-left" | "top-right" | "bottom-left" | "bottom-right"`}</code></td>
+          <td><code>"bottom-right"</code></td>
+          <td>控件在地图上的位置</td>
+        </tr>
+        <tr>
+          <td><code>showZoom</code></td>
+          <td><code>boolean</code></td>
+          <td><code>true</code></td>
+          <td>显示缩放按钮</td>
+        </tr>
+        <tr>
+          <td><code>showCompass</code></td>
+          <td><code>boolean</code></td>
+          <td><code>false</code></td>
+          <td>显示指北针按钮以重置方向</td>
+        </tr>
+        <tr>
+          <td><code>showLocate</code></td>
+          <td><code>boolean</code></td>
+          <td><code>false</code></td>
+          <td>显示定位按钮以查找用户位置</td>
+        </tr>
+        <tr>
+          <td><code>showFullscreen</code></td>
+          <td><code>boolean</code></td>
+          <td><code>false</code></td>
+          <td>显示全屏切换按钮</td>
+        </tr>
+        <tr>
+          <td><code>className</code></td>
+          <td><code>string</code></td>
+          <td>—</td>
+          <td>控件容器的额外 CSS 类名</td>
+        </tr>
+        <tr>
+          <td><code>onLocate</code></td>
+          <td><code>{`(coords: { longitude: number; latitude: number }) => void`}</code></td>
+          <td>—</td>
+          <td>定位用户时的回调函数</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">标记</p>
+    </div>
+    <a href="/docs/markers" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapMarker 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

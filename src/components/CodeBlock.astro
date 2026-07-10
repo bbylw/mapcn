@@ -1,0 +1,64 @@
+---
+interface Props {
+  code: string;
+  lang?: string;
+  title?: string;
+}
+
+const { code, lang = "bash", title } = Astro.props;
+
+// Simple syntax highlighting for different languages
+function highlight(code: string, lang: string): string {
+  const escaped = code
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  if (lang === "bash" || lang === "sh") {
+    return escaped
+      .replace(/(#.*$)/gm, '<span class="tk-comment">$1</span>')
+      .replace(/("(?:[^"\\]|\\.)*")/g, '<span class="tk-string">$1</span>')
+      .replace(/(\$\s*\w+)/g, '<span class="tk-function">$1</span>')
+      .replace(/\b(npx|npm|pnpm|yarn|bun|node|git)\b/g, '<span class="tk-keyword">$1</span>');
+  }
+
+  if (lang === "tsx" || lang === "jsx" || lang === "ts" || lang === "js") {
+    let result = escaped;
+    // Comments
+    result = result.replace(/(\/\/.*$)/gm, '<span class="tk-comment">$1</span>');
+    result = result.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="tk-comment">$1</span>');
+    // Strings
+    result = result.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="tk-string">$1</span>');
+    result = result.replace(/('(?:[^'\\]|\\.)*')/g, '<span class="tk-string">$1</span>');
+    result = result.replace(/(`(?:[^`\\]|\\.)*`)/g, '<span class="tk-string">$1</span>');
+    // Keywords
+    result = result.replace(/\b(import|from|export|default|const|let|var|function|return|if|else|for|while|use|interface|type|extends|implements|class|new|async|await|true|false|null|undefined|void|this|super|static|public|private|protected|readonly)\b/g, '<span class="tk-keyword">$1</span>');
+    // JSX tags
+    result = result.replace(/(&lt;\/?)([A-Z]\w*)/g, '$1<span class="tk-tag">$2</span>');
+    result = result.replace(/(&lt;\/?)([a-z]\w*)/g, '$1<span class="tk-tag">$2</span>');
+    // Numbers
+    result = result.replace(/\b(\d+\.?\d*)\b/g, '<span class="tk-number">$1</span>');
+    return result;
+  }
+
+  return escaped;
+}
+
+const highlighted = highlight(code, lang);
+---
+
+<div class="code-block group">
+  {title && (
+    <div class="flex items-center justify-between px-4 py-2.5 border-b border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
+      <span class="text-xs font-mono text-[var(--color-text-tertiary)]">{title}</span>
+    </div>
+  )}
+  <div class="flex items-start">
+    <div class="flex flex-col py-5 px-3 text-right select-none border-r border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]/50">
+      {code.split("\n").map((_, i) => (
+        <span class="text-xs leading-[1.6] text-[var(--color-text-tertiary)] font-mono">{i + 1}</span>
+      ))}
+    </div>
+    <pre class="flex-1 py-5 px-4 overflow-x-auto text-sm leading-[1.6]"><code set:html={highlighted}></code></pre>
+  </div>
+</div>

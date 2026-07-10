@@ -1,0 +1,106 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Routes 路线" description="在地图上绘制路线和路径，支持点击和悬停交互。">
+  <h1>Routes 路线</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    在地图上渲染连接坐标点的线/路线。支持点击和悬停交互，可构建路线选择 UI。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <CodeBlock code={`import { Map, MapRoute } from "@/components/ui/map";
+
+const route = [
+  [-74.006, 40.7128], // 纽约
+  [-73.9857, 40.7484], // 帝国大厦
+  [-73.9851, 40.7589], // 时代广场
+  [-73.9724, 40.7831], // 中央公园
+];
+
+export function MapWithRoute() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-73.99, 40.75]} zoom={12}>
+        <MapRoute coordinates={route} />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MapWithRoute.tsx" />
+
+  <h2 id="custom-style">自定义样式</h2>
+  <p>自定义路线颜色、宽度和透明度：</p>
+  <CodeBlock code={`<MapRoute
+  coordinates={route}
+  color="#ef4444"
+  width={4}
+  opacity={0.9}
+/>`} lang="tsx" />
+
+  <h2 id="dashed-line">虚线</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">dashArray</code> 创建虚线：</p>
+  <CodeBlock code={`<MapRoute
+  coordinates={route}
+  color="#f59e0b"
+  width={3}
+  dashArray={[2, 2]}
+/>`} lang="tsx" />
+
+  <h2 id="interactive">交互路线</h2>
+  <p>启用鼠标事件以构建路线选择 UI：</p>
+  <CodeBlock code={`import { Map, MapRoute } from "@/components/ui/map";
+import { useState } from "react";
+
+export function InteractiveRoute() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-73.99, 40.75]} zoom={12}>
+        <MapRoute
+          coordinates={route}
+          color={hovered ? "#22d3ee" : "#4285F4"}
+          width={hovered ? 5 : 3}
+          interactive
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onClick={() => console.log("路线被点击")}
+        />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="InteractiveRoute.tsx" />
+
+  <h2 id="props">属性</h2>
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr><th>属性</th><th>类型</th><th>默认值</th><th>描述</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td><code>string</code></td><td>自动生成</td><td>路线图层的唯一标识符</td></tr>
+        <tr><td><code>coordinates</code></td><td><code>{`[number, number][]`}</code></td><td>—</td><td>坐标对数组 [经度, 纬度]</td></tr>
+        <tr><td><code>color</code></td><td><code>string</code></td><td><code>"#4285F4"</code></td><td>线条颜色（CSS 颜色值）</td></tr>
+        <tr><td><code>width</code></td><td><code>number</code></td><td><code>3</code></td><td>线条宽度（像素）</td></tr>
+        <tr><td><code>opacity</code></td><td><code>number</code></td><td><code>0.8</code></td><td>线条透明度（0-1）</td></tr>
+        <tr><td><code>dashArray</code></td><td><code>{`[number, number]`}</code></td><td>—</td><td>虚线模式 [线段长度, 间隔长度]</td></tr>
+        <tr><td><code>onClick</code></td><td><code>{`() => void`}</code></td><td>—</td><td>路线点击回调</td></tr>
+        <tr><td><code>onMouseEnter</code></td><td><code>{`() => void`}</code></td><td>—</td><td>鼠标进入路线回调</td></tr>
+        <tr><td><code>onMouseLeave</code></td><td><code>{`() => void`}</code></td><td>—</td><td>鼠标离开路线回调</td></tr>
+        <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>false</code></td><td>响应鼠标事件</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">弧线</p>
+    </div>
+    <a href="/docs/arcs" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapArc 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>

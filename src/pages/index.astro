@@ -1,0 +1,518 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CodeBlock from "../components/CodeBlock.astro";
+import InteractiveMap from "../components/InteractiveMap.astro";
+
+const installCode = `npx shadcn@latest add @mapcn/map`;
+
+const componentShowcase = [
+  {
+    name: "MapMarker",
+    desc: "自定义标记与弹窗",
+    href: "/docs/markers",
+    code: `<MapMarker longitude={-74.006} latitude={40.7128}>
+  <MarkerContent>
+    <MarkerLabel>纽约市</MarkerLabel>
+  </MarkerContent>
+  <MarkerPopup closeButton>
+    点击查看详情
+  </MarkerPopup>
+</MapMarker>`,
+    mockupVariant: "markers" as const,
+  },
+  {
+    name: "MapRoute",
+    desc: "路径绘制与交互",
+    href: "/docs/routes",
+    code: `<MapRoute
+  coordinates={route}
+  color="#22d3ee"
+  width={4}
+  interactive
+  onClick={() => console.log("clicked")}
+/>`,
+    mockupVariant: "routes" as const,
+  },
+  {
+    name: "MapArc",
+    desc: "弧线连接与悬停",
+    href: "/docs/arcs",
+    code: `<MapArc
+  data={arcs}
+  curvature={0.3}
+  paint={{
+    "line-color": ["get", "color"],
+    "line-width": 3,
+  }}
+  hoverPaint={{ "line-width": 6 }}
+/>`,
+    mockupVariant: "arcs" as const,
+  },
+  {
+    name: "MapGeoJSON",
+    desc: "区域填充与悬停",
+    href: "/docs/geojson",
+    code: `<MapGeoJSON
+  data={WORLD_GEOJSON}
+  promoteId="name"
+  interactive
+  fillPaint={{
+    "fill-color": ["match", ["get", "continent"],
+      "Asia", "#f59e0b", "Europe", "#22d3ee",
+      "#64748b"],
+    "fill-opacity": 0.5,
+  }}
+/>`,
+    mockupVariant: "geojson" as const,
+  },
+  {
+    name: "MapClusterLayer",
+    desc: "大数据聚类展开",
+    href: "/docs/clusters",
+    code: `<MapClusterLayer
+  data={earthquakesGeoJSON}
+  clusterRadius={50}
+  clusterMaxZoom={14}
+  clusterColors={[
+    "#22c55e", "#eab308", "#ef4444"
+  ]}
+  pointColor="#3b82f6"
+  onPointClick={(f, c) => setSelected({ ... })}
+/>`,
+    mockupVariant: "clusters" as const,
+  },
+  {
+    name: "Map blank",
+    desc: "无瓦片数据可视化",
+    href: "/docs/basic-map",
+    code: `<Map blank center={[0, 20]} zoom={1}>
+  <MapGeoJSON data={WORLD_GEOJSON} />
+  <MapArc data={connections} />
+</Map>`,
+    mockupVariant: "blank" as const,
+  },
+];
+
+const blocks = [
+  { name: "Analytics Map", desc: "数据分析地图", install: "@mapcn/analytics-map", color: "#22d3ee" },
+  { name: "Choropleth", desc: "等值线地图", install: "@mapcn/choropleth", color: "#f59e0b" },
+  { name: "Uptime Monitor", desc: "运行时间监控", install: "@mapcn/uptime-monitor", color: "#22c55e" },
+  { name: "Logistics Network", desc: "物流网络", install: "@mapcn/logistics-network", color: "#a855f7" },
+  { name: "Store Locator", desc: "门店定位器", install: "@mapcn/store-locator", color: "#ef4444" },
+  { name: "Heatmap", desc: "热力图", install: "@mapcn/heatmap", color: "#f97316" },
+  { name: "Delivery Tracker", desc: "配送追踪器", install: "@mapcn/delivery-tracker", color: "#3b82f6" },
+];
+
+const providers = [
+  { name: "OpenStreetMap", desc: "社区驱动，开源", color: "#7cba34" },
+  { name: "CARTO", desc: "简洁底图，数据可视化", color: "#22d3ee" },
+  { name: "MapTiler", desc: "精美矢量瓦片", color: "#3b82f6" },
+  { name: "Stadia Maps", desc: "快速可靠，多风格", color: "#f59e0b" },
+  { name: "Thunderforest", desc: "户外、骑行、交通", color: "#ef4444" },
+];
+---
+
+<BaseLayout>
+  <!-- ============ HERO ============ -->
+  <section class="relative overflow-hidden bg-noise">
+    <div class="absolute inset-0 bg-grid opacity-40"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[var(--color-brand-500)]/8 rounded-full blur-[160px]"></div>
+    <div class="absolute top-1/3 right-0 w-[350px] h-[350px] bg-[var(--color-accent-500)]/4 rounded-full blur-[120px]"></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 lg:pt-24 lg:pb-20">
+      <div class="grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+        <!-- Left: Text -->
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full glass border border-[var(--color-brand-500)]/15 animate-fade-in">
+            <span class="relative flex h-1.5 w-1.5">
+              <span class="animate-ping-soft absolute inline-flex h-full w-full rounded-full bg-[var(--color-brand-400)]"></span>
+              <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--color-brand-500)]"></span>
+            </span>
+            <span class="text-xs text-[var(--color-text-secondary)] font-mono">基于 MapLibre GL / shadcn/ui 模式 / MIT 开源</span>
+          </div>
+
+          <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter mb-6 animate-fade-in-up stagger-1 leading-[1.05]">
+            为 React 而生的<br />
+            <span class="gradient-text">地图组件库</span>
+          </h1>
+
+          <p class="text-lg text-[var(--color-text-secondary)] leading-relaxed mb-8 max-w-xl animate-fade-in-up stagger-2">
+            一条命令安装，复制粘贴即用。标记、弹窗、路线、弧线、聚类、GeoJSON，
+            8 个组件覆盖所有地图场景。
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-start gap-3 mb-8 animate-fade-in-up stagger-3">
+            <a href="/docs" class="group relative px-6 py-3 text-base font-medium text-[var(--color-bg-base)] bg-[var(--color-brand-500)] hover:bg-[var(--color-brand-400)] rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(6,182,212,0.45)] hover:scale-[1.02] active:scale-[0.97]">
+              快速开始
+              <svg class="inline-block ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </a>
+            <a href="/docs/api-reference" class="px-6 py-3 text-base font-medium text-[var(--color-text-primary)] glass hover:bg-[var(--color-bg-hover)] rounded-xl transition-all duration-300 active:scale-[0.97]">
+              API 参考
+            </a>
+          </div>
+
+          <div class="animate-fade-in-up stagger-4 max-w-md">
+            <div class="code-block">
+              <div class="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500/50"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500/50"></span>
+                <span class="text-xs font-mono text-[var(--color-text-tertiary)] ml-2">Terminal</span>
+              </div>
+              <pre class="py-3.5 px-5 text-sm"><code><span class="tk-keyword">npx</span> shadcn@latest <span class="tk-function">add</span> <span class="tk-string">@mapcn/map</span></code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Map -->
+        <div class="relative animate-fade-in-up stagger-3">
+          <div class="absolute -inset-3 bg-gradient-to-br from-[var(--color-brand-500)]/15 to-transparent rounded-3xl blur-2xl"></div>
+          <div class="relative">
+            <div class="rounded-2xl overflow-hidden border border-[var(--color-border-default)] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)]">
+              <div class="flex items-center justify-between px-4 py-2.5 glass border-b border-[var(--color-border-default)]">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500/50"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-500/50"></span>
+                </div>
+                <span class="text-xs font-mono text-[var(--color-text-tertiary)]">MyMap.tsx</span>
+                <div class="flex items-center gap-1.5">
+                  <div class="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-400)] animate-pulse-soft"></div>
+                  <span class="text-xs text-[var(--color-text-tertiary)] font-mono">live</span>
+                </div>
+              </div>
+              <InteractiveMap variant="hero" height="420px" />
+            </div>
+            <!-- Floating code snippet -->
+            <div class="absolute -bottom-5 -left-5 hidden lg:block max-w-xs">
+              <div class="code-block !rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] glass-panel">
+                <pre class="py-3 px-4 text-xs"><code><span class="tk-keyword">import</span> {<span class="tk-function">Map</span>} <span class="tk-keyword">from</span> <span class="tk-string">"@/components/ui/map"</span>
+
+&lt;<span class="tk-tag">Map</span> center={[<span class="tk-number">-74.006</span>, <span class="tk-number">40.7128</span>]} zoom={<span class="tk-number">11</span>} /&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STAT BAR ============ -->
+  <section class="relative py-10 border-y border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]/40">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {[
+          { num: "8", label: "核心组件" },
+          { num: "7", label: "预构建区块" },
+          { num: "10.7k", label: "GitHub Stars" },
+          { num: "0", label: "配置步骤" },
+        ].map((stat) => (
+          <div class="text-center">
+            <div class="font-display text-3xl lg:text-4xl font-bold gradient-text">{stat.num}</div>
+            <div class="text-sm text-[var(--color-text-tertiary)] mt-1">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPONENT SHOWCASE ============ -->
+  <section class="relative py-24 lg:py-32">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 reveal">
+        <h2 class="font-display text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          看看 mapcn 能做什么
+        </h2>
+        <p class="text-lg text-[var(--color-text-secondary)] max-w-2xl">
+          每个组件都设计为可组合、可定制、类型安全。左侧是代码，右侧是效果。
+        </p>
+      </div>
+
+      <div class="space-y-10">
+        {componentShowcase.map((comp, i) => (
+          <div class:list={["grid lg:grid-cols-2 gap-8 items-center reveal", i % 2 === 1 && "lg:[&>*:first-child]:order-2"]}>
+            <!-- Code side -->
+            <div>
+              <div class="flex items-baseline gap-3 mb-4">
+                <a href={comp.href} class="font-mono text-xl font-semibold text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+                  {comp.name}
+                </a>
+                <span class="text-sm text-[var(--color-text-tertiary)]">{comp.desc}</span>
+              </div>
+              <CodeBlock code={comp.code} lang="tsx" />
+              <a href={comp.href} class="inline-flex items-center gap-2 mt-4 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+                查看文档
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </a>
+            </div>
+            <!-- Visual side -->
+            <div class="relative">
+              <div class="rounded-2xl overflow-hidden border border-[var(--color-border-default)] shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] spotlight-card" data-spotlight>
+                <div class="flex items-center justify-between px-3 py-2 glass border-b border-[var(--color-border-default)]">
+                  <span class="text-xs font-mono text-[var(--color-text-tertiary)]">{comp.name}.tsx</span>
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-400)] animate-pulse-soft"></div>
+                    <span class="text-xs text-[var(--color-text-tertiary)] font-mono">preview</span>
+                  </div>
+                </div>
+                <InteractiveMap variant={comp.mockupVariant} height="340px" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES BENTO ============ -->
+  <section class="relative py-24 lg:py-32 border-y border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]/30 bg-noise">
+    <div class="absolute inset-0 bg-dots opacity-15"></div>
+    <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 reveal">
+        <h2 class="font-display text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          为开发者体验而生
+        </h2>
+        <p class="text-lg text-[var(--color-text-secondary)] max-w-2xl">
+          大多数 React 地图方案要么过于臃肿，要么限制太多。mapcn 为希望快速交付且不放弃控制力的团队而生。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Large: Zero Config -->
+        <div class="group relative p-7 lg:p-8 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card lg:col-span-2 reveal" data-spotlight>
+          <div class="flex items-start gap-6">
+            <div class="w-14 h-14 rounded-xl bg-[var(--color-brand-500)]/8 border border-[var(--color-brand-500)]/15 flex items-center justify-center flex-shrink-0">
+              <svg class="w-7 h-7 text-[var(--color-brand-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+            </div>
+            <div>
+              <h3 class="font-display text-xl font-semibold mb-2">零配置，一条命令安装</h3>
+              <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
+                默认使用免费 CARTO 瓦片，无需 API 密钥，无需搭建瓦片服务。
+                运行 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/8 px-1.5 py-0.5 rounded text-xs font-mono">npx shadcn@latest add @mapcn/map</code>，
+                导入组件，传入坐标，你的地图就准备好了。
+              </p>
+              <div class="flex flex-wrap gap-2">
+                {["无需 API Key", "免费瓦片", "开箱即用", "复制粘贴"].map((tag) => (
+                  <span class="px-2.5 py-1 text-xs rounded-md bg-[var(--color-brand-500)]/6 text-[var(--color-brand-300)] border border-[var(--color-brand-500)]/12">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Aware -->
+        <div class="group relative p-6 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card overflow-hidden reveal" data-spotlight>
+          <div class="absolute top-0 right-0 w-32 h-32 bg-[var(--color-brand-500)]/4 rounded-full blur-2xl"></div>
+          <div class="relative">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-[var(--color-brand-500)]/8 border border-[var(--color-brand-500)]/15 flex items-center justify-center">
+                <svg class="w-5 h-5 text-[var(--color-brand-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round" /></svg>
+              </div>
+              <h3 class="font-display text-lg font-semibold">主题感知</h3>
+            </div>
+            <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-3">
+              自动适配浅色/深色模式，地图样式随应用主题无缝切换。
+            </p>
+            <div class="flex gap-2">
+              <div class="flex-1 h-14 rounded-lg bg-[#f8fafc] border border-slate-200 flex items-center justify-center">
+                <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+              </div>
+              <div class="flex-1 h-14 rounded-lg bg-[#08090d] border border-[var(--color-border-default)] flex items-center justify-center">
+                <div class="w-3 h-3 rounded-full bg-[var(--color-brand-400)]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MapLibre GL Powered -->
+        <div class="group relative p-7 lg:p-8 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card lg:col-span-2 reveal" data-spotlight>
+          <div class="flex items-start gap-6">
+            <div class="w-14 h-14 rounded-xl bg-[var(--color-brand-500)]/8 border border-[var(--color-brand-500)]/15 flex items-center justify-center flex-shrink-0">
+              <svg class="w-7 h-7 text-[var(--color-brand-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
+            </div>
+            <div>
+              <h3 class="font-display text-xl font-semibold mb-2">MapLibre GL 驱动，无黑盒</h3>
+              <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-3">
+                基于 MapLibre GL JS 构建，保持 API 熟悉感。使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/8 px-1.5 py-0.5 rounded text-xs font-mono">ref</code> 或
+                <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/8 px-1.5 py-0.5 rounded text-xs font-mono">useMap</code> hook
+                随时下沉到原始 MapLibre API，自定义控件、图层、事件监听，没有任何限制。
+              </p>
+              <div class="flex flex-wrap gap-2">
+                {["useMap Hook", "MapRef", "自定义图层", "事件监听", "3D 地球"].map((tag) => (
+                  <span class="px-2.5 py-1 text-xs rounded-md bg-[var(--color-bg-hover)] text-[var(--color-text-secondary)] border border-[var(--color-border-default)]">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- shadcn/ui Compatible -->
+        <div class="group relative p-6 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card reveal" data-spotlight>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-[var(--color-brand-500)]/8 border border-[var(--color-brand-500)]/15 flex items-center justify-center">
+              <svg class="w-5 h-5 text-[var(--color-brand-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>
+            </div>
+            <h3 class="font-display text-lg font-semibold">兼容 shadcn/ui</h3>
+          </div>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            使用与 shadcn/ui 相同的模式和样式约定。复制粘贴，完全拥有代码，零锁定。
+          </p>
+        </div>
+
+        <!-- Composable -->
+        <div class="group relative p-6 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card reveal" data-spotlight>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-[var(--color-brand-500)]/8 border border-[var(--color-brand-500)]/15 flex items-center justify-center">
+              <svg class="w-5 h-5 text-[var(--color-brand-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
+            </div>
+            <h3 class="font-display text-lg font-semibold">可组合</h3>
+          </div>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            声明式组件构建复杂地图 UI。像搭积木一样组合标记、弹窗、路线和控件。
+          </p>
+        </div>
+
+        <!-- TypeScript -->
+        <div class="group relative p-6 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card reveal" data-spotlight>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-[var(--color-brand-500)]/8 border border-[var(--color-brand-500)]/15 flex items-center justify-center">
+              <svg class="w-5 h-5 text-[var(--color-brand-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
+            </div>
+            <h3 class="font-display text-lg font-semibold">TypeScript</h3>
+          </div>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+            完整的类型安全支持，泛型组件实现类型安全的属性访问。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BLOCKS ============ -->
+  <section class="relative py-24 lg:py-32">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 reveal">
+        <p class="text-sm font-semibold text-[var(--color-accent-500)] mb-3">预构建区块</p>
+        <h2 class="font-display text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          7 个业务场景区块<br />即装即用
+        </h2>
+        <p class="text-lg text-[var(--color-text-secondary)] max-w-2xl">
+          除了基础组件，mapcn 还提供一系列预构建的地图区块。一条命令安装，直接集成到你的项目。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {blocks.map((block) => (
+          <div class="group relative p-6 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover spotlight-card overflow-hidden reveal" data-spotlight>
+            <div class="absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-15" style={`background: ${block.color}`}></div>
+            <div class="relative">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h3 class="font-display text-lg font-semibold mb-1">{block.name}</h3>
+                  <p class="text-sm text-[var(--color-text-tertiary)]">{block.desc}</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={`background: ${block.color}12; border: 1px solid ${block.color}28`}>
+                  <div class="w-4 h-4 rounded-sm" style={`background: ${block.color}`}></div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 mb-3">
+                {["#22d3ee", "#f59e0b", "#22c55e", "#a855f7"].map((c, i) => (
+                  <div class="w-1.5 h-1.5 rounded-full" style={`background: ${c}; opacity: ${1 - i * 0.2}`}></div>
+                ))}
+                <span class="text-xs text-[var(--color-text-tertiary)] ml-1">可视化就绪</span>
+              </div>
+              <div class="code-block !rounded-lg">
+                <pre class="py-2.5 px-3 text-xs"><code><span class="tk-keyword">npx</span> shadcn@latest <span class="tk-function">add</span> <span class="tk-string">{block.install}</span></code></pre>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROVIDERS ============ -->
+  <section class="relative py-24 lg:py-32 border-y border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)]/30">
+    <div class="absolute inset-0 bg-grid-sm opacity-15"></div>
+    <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 reveal">
+        <h2 class="font-display text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+          兼容任意地图样式
+        </h2>
+        <p class="text-lg text-[var(--color-text-secondary)] max-w-2xl">
+          mapcn 支持所有 MapLibre 兼容的瓦片提供商。使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/8 px-1.5 py-0.5 rounded text-xs font-mono">styles</code> 属性指定自定义样式，或用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/8 px-1.5 py-0.5 rounded text-xs font-mono">blank</code> 创建无瓦片的数据可视化画布。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {providers.map((provider) => (
+          <div class="p-5 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] card-hover text-center reveal">
+            <div class="w-8 h-8 rounded-lg mx-auto mb-3 flex items-center justify-center" style={`background: ${provider.color}12; border: 1px solid ${provider.color}28`}>
+              <div class="w-3 h-3 rounded-full" style={`background: ${provider.color}`}></div>
+            </div>
+            <h4 class="font-display text-sm font-semibold mb-1">{provider.name}</h4>
+            <p class="text-xs text-[var(--color-text-tertiary)]">{provider.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="relative py-24 lg:py-32">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative overflow-hidden rounded-3xl bg-[var(--color-bg-surface)] border border-[var(--color-brand-500)]/15 p-12 lg:p-16 bg-noise">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-[var(--color-brand-500)]/12 rounded-full blur-[130px]"></div>
+        <div class="absolute inset-0 bg-grid opacity-10"></div>
+
+        <div class="relative text-center max-w-2xl mx-auto">
+          <h2 class="font-display text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+            准备好开始了吗？
+          </h2>
+          <p class="text-lg text-[var(--color-text-secondary)] mb-10">
+            一条命令安装，几分钟内将交互式地图集成到你的 React 应用中。
+            完全拥有代码，零锁定。
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <a href="/docs" class="px-8 py-3.5 text-base font-medium text-[var(--color-bg-base)] bg-[var(--color-brand-500)] hover:bg-[var(--color-brand-400)] rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(6,182,212,0.45)] hover:scale-[1.02] active:scale-[0.97]">
+              快速开始
+            </a>
+            <a href="https://github.com/AnmolSaini16/mapcn" target="_blank" rel="noopener noreferrer" class="px-8 py-3.5 text-base font-medium text-[var(--color-text-primary)] glass hover:bg-[var(--color-bg-hover)] rounded-xl transition-all duration-300 active:scale-[0.97]">
+              GitHub 仓库
+            </a>
+          </div>
+          <div class="code-block inline-block !rounded-xl">
+            <pre class="py-3 px-5 text-sm"><code><span class="tk-keyword">npx</span> shadcn@latest <span class="tk-function">add</span> <span class="tk-string">@mapcn/map</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Scroll reveal animation
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -80px 0px" }
+  );
+  document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+  // Spotlight cursor tracking
+  document.querySelectorAll("[data-spotlight]").forEach((card) => {
+    card.addEventListener("mousemove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty("--mx", x + "%");
+      card.style.setProperty("--my", y + "%");
+    });
+  });
+</script>

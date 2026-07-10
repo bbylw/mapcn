@@ -1,0 +1,200 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+---
+
+<DocsLayout title="Map 地图组件" description="MapLibre 驱动的基础地图容器组件，支持主题感知、可组合和全自定义。">
+  <h1>Map 地图组件</h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8">
+    MapLibre 驱动的地图容器组件，支持标记、弹窗、提示、路线和控件。
+  </p>
+
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 是根容器组件，
+    它初始化 MapLibre GL 并为子组件提供上下文。自动处理浅色和深色模式之间的主题切换。
+  </p>
+
+  <h2 id="basic-usage">基本用法</h2>
+  <p>最简单的地图只需要设置中心坐标和缩放级别：</p>
+  <CodeBlock code={`import { Map, MapControls } from "@/components/ui/map";
+
+export function MyMap() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map center={[-74.006, 40.7128]} zoom={11}>
+        <MapControls />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="MyMap.tsx" />
+
+  <h2 id="blank-mode">空白模式</h2>
+  <p>
+    使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">blank</code> 属性创建透明、无瓦片的画布。
+    单独使用时不渲染任何内容，你需要添加自己的图层。
+  </p>
+  <CodeBlock code={`import { Map, MapGeoJSON } from "@/components/ui/map";
+
+const WORLD_GEOJSON =
+  "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@v5.1.2/geojson/ne_110m_admin_0_countries.geojson";
+
+export function BlankMap() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map blank center={[0, 0]} zoom={1}>
+        <MapGeoJSON data={WORLD_GEOJSON} />
+      </Map>
+    </div>
+  );
+}`} lang="tsx" title="BlankMap.tsx" />
+
+  <h2 id="custom-styles">自定义样式</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">styles</code> 属性指定自定义地图样式：</p>
+  <CodeBlock code={`import { Map } from "@/components/ui/map";
+
+export function CustomStyleMap() {
+  return (
+    <div className="h-[320px] overflow-hidden rounded-lg">
+      <Map
+        center={[-74.006, 40.7128]}
+        zoom={11}
+        styles={{
+          light: "https://maps.tilehosting.com/styles/positron/style.json?key=YOUR_KEY",
+          dark: "https://maps.tilehosting.com/styles/dark-matter/style.json?key=YOUR_KEY",
+        }}
+      />
+    </div>
+  );
+}`} lang="tsx" title="CustomStyleMap.tsx" />
+
+  <h2 id="theme">主题控制</h2>
+  <p>
+    默认情况下，<code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 会自动从文档类名或系统偏好中检测主题。
+    你也可以通过 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">theme</code> 属性手动指定：
+  </p>
+  <CodeBlock code={`<Map center={[-74.006, 40.7128]} zoom={11} theme="dark">
+  <MapControls />
+</Map>`} lang="tsx" />
+
+  <h2 id="globe">3D 地球视图</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">projection</code> 属性启用 3D 地球视图：</p>
+  <CodeBlock code={`<Map
+  center={[0, 20]}
+  zoom={1}
+  projection={{ type: "globe" }}
+>
+  <MapControls showZoom showCompass />
+</Map>`} lang="tsx" />
+
+  <h2 id="controlled-viewport">受控视口</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">viewport</code> 和 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">onViewportChange</code> 实现受控模式：</p>
+  <CodeBlock code={`import { Map, type MapViewport } from "@/components/ui/map";
+import { useState } from "react";
+
+export function ControlledMap() {
+  const [viewport, setViewport] = useState<MapViewport>({
+    longitude: -74.006,
+    latitude: 40.7128,
+    zoom: 11,
+  });
+
+  return (
+    <Map
+      viewport={viewport}
+      onViewportChange={setViewport}
+      className="h-[320px]"
+    />
+  );
+}`} lang="tsx" title="ControlledMap.tsx" />
+
+  <h2 id="loading">加载指示器</h2>
+  <p>使用 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">loading</code> 属性显示加载指示器：</p>
+  <CodeBlock code={`<Map center={[-74.006, 40.7128]} zoom={11} loading />`} lang="tsx" />
+
+  <h2 id="props">属性</h2>
+  <p>
+    <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">Map</code> 组件继承了 MapLibre GL 的
+    <a href="https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/" target="_blank" rel="noopener noreferrer">MapOptions</a>
+    （排除 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">container</code> 和 <code class="text-[var(--color-brand-300)] bg-[var(--color-brand-500)]/10 px-1.5 py-0.5 rounded text-sm">style</code>）。
+  </p>
+
+  <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--color-border-default)]">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>属性</th>
+          <th>类型</th>
+          <th>默认值</th>
+          <th>描述</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>children</code></td>
+          <td><code>ReactNode</code></td>
+          <td>—</td>
+          <td>子组件（标记、弹窗、控件、路线）</td>
+        </tr>
+        <tr>
+          <td><code>className</code></td>
+          <td><code>string</code></td>
+          <td>—</td>
+          <td>地图容器的额外 CSS 类名</td>
+        </tr>
+        <tr>
+          <td><code>theme</code></td>
+          <td><code>"light" | "dark"</code></td>
+          <td>自动检测</td>
+          <td>地图主题。未提供时从文档类名或系统偏好自动检测</td>
+        </tr>
+        <tr>
+          <td><code>styles</code></td>
+          <td><code>{`{ light?: string | StyleSpecification; dark?: string | StyleSpecification }`}</code></td>
+          <td>—</td>
+          <td>自定义地图样式，覆盖默认 CARTO 底图</td>
+        </tr>
+        <tr>
+          <td><code>blank</code></td>
+          <td><code>boolean</code></td>
+          <td><code>false</code></td>
+          <td>使用透明、无瓦片的底图。需要添加自己的图层</td>
+        </tr>
+        <tr>
+          <td><code>projection</code></td>
+          <td><code>ProjectionSpecification</code></td>
+          <td>—</td>
+          <td>地图投影类型。使用 <code>{`{ type: "globe" }`}</code> 启用 3D 地球</td>
+        </tr>
+        <tr>
+          <td><code>viewport</code></td>
+          <td><code>{`Partial<MapViewport>`}</code></td>
+          <td>—</td>
+          <td>受控视口状态。与 onViewportChange 配合实现受控模式</td>
+        </tr>
+        <tr>
+          <td><code>onViewportChange</code></td>
+          <td><code>{`(viewport: MapViewport) => void`}</code></td>
+          <td>—</td>
+          <td>视口变化时的回调函数</td>
+        </tr>
+        <tr>
+          <td><code>loading</code></td>
+          <td><code>boolean</code></td>
+          <td><code>false</code></td>
+          <td>在地图上显示加载指示器</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between p-6 rounded-xl bg-[var(--color-bg-surface)] border border-[var(--color-border-default)]">
+    <div>
+      <p class="text-sm text-[var(--color-text-tertiary)] mb-1">下一步</p>
+      <p class="font-semibold">控件</p>
+    </div>
+    <a href="/docs/controls" class="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand-400)] hover:text-[var(--color-brand-300)] transition-colors">
+      MapControls 组件
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+    </a>
+  </div>
+</DocsLayout>
